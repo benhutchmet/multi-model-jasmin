@@ -202,6 +202,27 @@ def calculate_rpc(correlation_coefficient, forecast_members):
 # for each start date and then uses this to get the 
 # confidence intervals
 def calculate_confidence_intervals_sd(ensemble_members_array, lower_bound=5, upper_bound=95):
+    """
+    Calculate the confidence intervals of an ensemble members array using the ensemble
+    standard deviation for each start date. This method calculates the ensemble standard
+    deviation and uses it to obtain the confidence intervals.
+
+    Parameters
+    ----------
+    ensemble_members_array : numpy.ndarray
+        The array of ensemble members data.
+    lower_bound : int, optional, default: 5
+        The lower percentile bound for the confidence interval.
+    upper_bound : int, optional, default: 95
+        The upper percentile bound for the confidence interval.
+
+    Returns
+    -------
+    conf_interval_lower : numpy.ndarray
+        The lower bound of the confidence interval.
+    conf_interval_upper : numpy.ndarray
+        The upper bound of the confidence interval.
+    """
     # Calculate the ensemble standard deviation for each start date
     ensemble_sd = np.std(ensemble_members_array, axis=0)
     
@@ -221,6 +242,26 @@ def calculate_confidence_intervals_sd(ensemble_members_array, lower_bound=5, upp
 # Second way - more simple
 # Function to calculate the confidence intervals
 def calculate_confidence_intervals(ensemble_members_array, lower_bound=5, upper_bound=95):
+    """
+    Calculate the confidence intervals of an ensemble members array using a simpler
+    method that directly computes the percentiles of the ensemble members data.
+
+    Parameters
+    ----------
+    ensemble_members_array : numpy.ndarray
+        The array of ensemble members data.
+    lower_bound : int, optional, default: 5
+        The lower percentile bound for the confidence interval.
+    upper_bound : int, optional, default: 95
+        The upper percentile bound for the confidence interval.
+
+    Returns
+    -------
+    conf_interval_lower : numpy.ndarray
+        The lower bound of the confidence interval.
+    conf_interval_upper : numpy.ndarray
+        The upper bound of the confidence interval.
+    """
     conf_interval_lower = np.percentile(ensemble_members_array, lower_bound, axis=0)
     conf_interval_upper = np.percentile(ensemble_members_array, upper_bound, axis=0)
     return conf_interval_lower, conf_interval_upper
@@ -228,6 +269,27 @@ def calculate_confidence_intervals(ensemble_members_array, lower_bound=5, upper_
 # Function to lag the NAO data and create a new time
 # array
 def process_lagged_ensemble_mean(data, time_array, lag=4):
+    """
+    Lag the input data by a specified number of years and create a new time array
+    corresponding to the lagged data. This function is useful for processing ensemble
+    mean data, such as the North Atlantic Oscillation (NAO) time series.
+    
+    Parameters
+    ----------
+    data : numpy.ndarray
+        The input data to be lagged, typically an ensemble mean time series.
+    time_array : numpy.ndarray
+        The time array corresponding to the input data.
+    lag : int, optional, default: 4
+        The number of years to lag the data by.
+    
+    Returns
+    -------
+    lagged_data_mean : numpy.ndarray
+        The lagged ensemble mean data.
+    model_time_lagged : numpy.ndarray
+        The new time array corresponding to the lagged data.
+    """
     def lagged_ensemble_mean(data, lag):
         # Initialize an empty array for the lagged ensemble mean
         lagged_mean = np.empty(len(data) - lag + 1)
@@ -249,4 +311,78 @@ def process_lagged_ensemble_mean(data, time_array, lag=4):
 # Example usage
 # lagged_adjusted_var_mean, model_time_lagged = process_lagged_ensemble_mean(adjusted_var_model_nao_anom_raw, model_time_raw, lag=4)
 
+# Function to adjust the variance of the ensemble
+# Used once the no. of ensemble members has been 4x
+# through the lagging process
+def adjust_variance(model_time_series):
+    """
+    Adjust the variance of an ensemble mean time series by dividing each value
+    by the ensemble mean standard deviation. This function is used after the
+    number of ensemble members has been increased by a factor of 4 through the
+    lagging process.
+    
+    Parameters
+    ----------
+    model_time_series : numpy.ndarray
+        The ensemble mean time series data to adjust the variance for.
+    
+    Returns
+    -------
+    model_time_series_var_adjust : numpy.ndarray
+        The adjusted time series data with variance scaled by the ensemble mean standard deviation.
+    """
+    # Calculate the standard deviation for the ensemble mean time series
+    model_std = np.std(model_time_series)
+
+    # Adjust the variance of the time series by dividing the value by the ensemble mean standard deviation
+    model_time_series_var_adjust = model_time_series / model_std
+
+    return model_time_series_var_adjust
+
+
+# Example usage - included for debugging
+# obs_data = np.array([1, 2, 3, 4, 5])
+# model_data = np.array([2, 4, 6, 8, 10])
+
+# obs_time_series_var_adjust, model_time_series_var_adjust = adjust_variance(obs_data, model_data)
+# print(obs_time_series_var_adjust)
+# print(model_time_series_var_adjust)
+
+# function for calculating the RMSE and 5-95% uncertainty intervals for the variance adjusted output
+def compute_rmse_confidence_intervals(obs_nao_anoms, adjusted_lagged_model_nao_anoms, lower_bound=5, upper_bound=95):
+    """
+    Compute the root-mean-square error (RMSE) between the variance-adjusted ensemble
+    mean and the observations. Calculate the 5%-95% confidence intervals for the
+    variance-adjusted model output.
+
+    Parameters
+    ----------
+    obs_nao_anoms : numpy.ndarray
+        The observed NAO anomalies time series.
+    adjusted_lagged_model_nao_anoms : numpy.ndarray
+        The adjusted and lagged model NAO anomalies time series.
+    lower_bound : int, optional, default: 5
+        The lower percentile bound for the confidence interval.
+    upper_bound : int, optional, default: 95
+        The upper percentile bound for the confidence interval.
+
+    Returns
+    -------
+    conf_interval_lower : numpy.ndarray
+        The lower bound of the confidence interval.
+    conf_interval_upper : numpy.ndarray
+        The upper bound of the confidence interval.
+    """
+    # Compute the root-mean-square error (RMSE) between the ensemble mean and the observations
+    rmse = np.sqrt(np.mean((obs_nao_anoms - adjusted_lagged_model_nao_anoms)**2, axis=0))
+
+    # Calculate the z-scores corresponding to the lower and upper bounds
+    z_score_lower = np.percentile(rmse, lower_bound)
+    z_score_upper = np.percentile(rmse, upper_bound)
+
+    # Calculate the 5% and 95% confidence intervals using the RMSE
+    conf_interval_lower = obs_nao_anoms - z_score_upper * rmse
+    conf_interval_upper = obs_nao_anoms + z_score_upper * rmse
+
+    return conf_interval_lower, conf_interval_upper
 
