@@ -386,7 +386,7 @@ def adjust_variance(model_time_series):
 # print(model_time_series_var_adjust)
 
 # function for calculating the RMSE and 5-95% uncertainty intervals for the variance adjusted output
-def compute_rmse_confidence_intervals(obs_nao_anoms, adjusted_lagged_model_nao_anoms, lower_bound=5, upper_bound=95):
+def compute_rmse_confidence_intervals(obs_nao_anoms, adjusted_lagged_model_nao_anoms, obs_time, model_time_lagged, lower_bound=5, upper_bound=95):
     """
     Compute the root-mean-square error (RMSE) between the variance-adjusted ensemble
     mean and the observations. Calculate the 5%-95% confidence intervals for the
@@ -398,6 +398,10 @@ def compute_rmse_confidence_intervals(obs_nao_anoms, adjusted_lagged_model_nao_a
         The observed NAO anomalies time series.
     adjusted_lagged_model_nao_anoms : numpy.ndarray
         The adjusted and lagged model NAO anomalies time series.
+    obs_time : numpy.ndarray
+        The time array for the observed NAO anomalies.
+    model_time_lagged : numpy.ndarray
+        The time array for the adjusted and lagged model NAO anomalies.
     lower_bound : int, optional, default: 5
         The lower percentile bound for the confidence interval.
     upper_bound : int, optional, default: 95
@@ -410,18 +414,32 @@ def compute_rmse_confidence_intervals(obs_nao_anoms, adjusted_lagged_model_nao_a
     conf_interval_upper : numpy.ndarray
         The upper bound of the confidence interval.
     """
+    # Match the years in obs_time and model_time_lagged
+    common_years = np.intersect1d(obs_time, model_time_lagged)
+
+    # Match the years in obs_time and model_time_lagged
+    common_years = np.intersect1d(obs_time, model_time_lagged)
+
+    # Find the indices of the common years in both arrays
+    obs_indices = np.where(np.isin(obs_time, common_years))[0]
+    model_indices = np.where(np.isin(model_time_lagged, common_years))[0]
+
+    # Create new arrays with the corresponding values for the common years
+    obs_nao_anoms_matched = obs_nao_anoms[obs_indices].values
+    adjusted_lagged_model_nao_anoms_matched = adjusted_lagged_model_nao_anoms[model_indices]
+    
     # Compute the root-mean-square error (RMSE) between the ensemble mean and the observations
-    rmse = np.sqrt(np.mean((obs_nao_anoms - adjusted_lagged_model_nao_anoms)**2, axis=0))
+    rmse = np.sqrt(np.mean((obs_nao_anoms_matched - adjusted_lagged_model_nao_anoms_matched)**2, axis=0))
 
-    # Calculate the z-scores corresponding to the lower and upper bounds
-    z_score_lower = np.percentile(rmse, lower_bound)
+    # Calculate the upper z-score for the RMSE
     z_score_upper = np.percentile(rmse, upper_bound)
-
+    
     # Calculate the 5% and 95% confidence intervals using the RMSE
-    conf_interval_lower = obs_nao_anoms - z_score_upper * rmse
-    conf_interval_upper = obs_nao_anoms + z_score_upper * rmse
+    conf_interval_lower = adjusted_lagged_model_nao_anoms_matched - (z_score_upper * rmse)
+    conf_interval_upper = adjusted_lagged_model_nao_anoms_matched + (z_score_upper * rmse)
 
     return conf_interval_lower, conf_interval_upper
+
 
 # Now write a plotting function
 def plot_ensemble_members_and_mean(models, model_times_by_model, model_nao_anoms_by_model, obs_nao_anom, obs_time):
@@ -513,11 +531,11 @@ def plot_ensemble_members_and_mean(models, model_times_by_model, model_nao_anoms
     ax.axhline(y=0, color="black", linestyle="-", linewidth=0.5)
     ax.set_xlim([np.datetime64("1960"), np.datetime64("2020")])
     ax.set_ylim([-10, 10])
-    ax.set_xlabel("Reference Year")
+    ax.set_xlabel("Year")
     ax.set_ylabel("NAO anomalies (hPa)")
 
-    # Set the title with the ACC score
-    ax.set_title(f"NAO ensemble mean and individual members (ACC: {acc_score:.2f})")
+    # Set the title with the ACC and RPC scores
+    ax.set_title(f"NAO ensemble mean and individual members (ACC: {acc_score:.2f}, RPC: {rpc:.2f})")
 
     # Add a legend in the bottom right corner
     ax.legend(loc="lower right")
@@ -525,6 +543,133 @@ def plot_ensemble_members_and_mean(models, model_times_by_model, model_nao_anoms
     # Save the figure
     # In the plots_dir directory
     fig.savefig(os.path.join(plots_dir, "nao_ensemble_mean_and_individual_members.png"), dpi=300)
+
+    # Show the figure
+    plt.show()
+
+def plot_ensemble_members_and_lagged_adjusted_mean(models, model_times_by_model, model_nao_anoms_by_model, obs_nao_anom, obs_time, lag=4):
+    """
+    Plot the ensemble mean of all members from all models and each of the ensemble members, with lagged and adjusted variance applied to the grand ensemble mean.
+
+    Parameters
+    ----------
+    models : dict
+        A dictionary containing a list of models.
+    model_times_by_model : dict
+        A dictionary containing model times for each model.
+    model_nao_anoms_by_model : dict
+        A dictionary containing model NAO anomalies for each model.
+    obs_nao_anom : numpy.ndarray
+        The observed NAO anomalies time series.
+    obs_time : numpy.ndarray
+        The observed time array.
+    lag : int, optional, default: 4
+        The number of years to lag the grand ensemble mean by.
+
+    Returns
+    -------
+    None
+    """
+
+    # Create a figure
+    fig, ax = plt.subplots(figsize=(10, 6))
+
+    # Initialize an empty list to store all ensemble members
+    all_ensemble_members = []
+
+    # Plot the ensemble members and calculate the ensemble mean for each model
+    ensemble_means = []
+
+    # Initialize a dictionary to store the count of ensemble members for each model
+    ensemble_member_counts = {}
+
+    # Iterate over the models
+    for model_name in models:
+        model_time = model_times_by_model[model_name]
+        model_nao_anom = model_nao_anoms_by_model[model_name]
+
+        # If the model_name is not in the dictionary, initialize its count to 0
+        if model_name not in ensemble_member_counts:
+            ensemble_member_counts[model_name] = 0
+
+        # Plot ensemble members
+        for member in model_nao_anom:
+            ax.plot(model_time, member, color="grey", alpha=0.1, linewidth=0.5)
+
+            # Add each member to the list of all ensemble members
+            all_ensemble_members.append(member)
+
+            # Increment the count of ensemble members for the current model
+            ensemble_member_counts[model_name] += 1
+
+        # Calculate and store ensemble mean
+        ensemble_means.append(ensemble_mean(model_nao_anom))
+
+    # Convert the ensemble_member_counts dictionary to a list of tuples
+    ensemble_member_counts_list = [(model, count) for model, count in ensemble_member_counts.items()]
+
+    # Convert the list of all ensemble members to a NumPy array
+    all_ensemble_members_array = np.array(all_ensemble_members)
+
+    # Calculate the grand ensemble mean using the new method
+    grand_ensemble_mean = np.mean(all_ensemble_members_array, axis=0)
+
+    # Apply lagging and variance adjustment to the grand ensemble mean
+    lagged_grand_ensemble_mean, model_time_lagged = process_lagged_ensemble_mean(grand_ensemble_mean, list(model_times_by_model.values())[0], lag)
+    lagged_adjusted_grand_ensemble_mean = adjust_variance(lagged_grand_ensemble_mean)
+
+    # Also just apply the variance adjustment to the grand ensemble mean
+    adjusted_grand_ensemble_mean = adjust_variance(grand_ensemble_mean)
+
+    # Calculate the ACC score using the function pearsonr_score with the lagged and adjusted grand ensemble mean
+    # For the skillful period
+    acc_score, p_value = pearsonr_score(obs_nao_anom, lagged_adjusted_grand_ensemble_mean, model_time_lagged, obs_time, "1969-01-01", "2010-12-31") 
+
+    # Calculate the RPC score using the function calculate_rpc
+    rpc = calculate_rpc(acc_score, all_ensemble_members_array)
+
+    print(obs_time[6:])
+    print(model_time_lagged)
+    print(np.shape(obs_nao_anom[6:]))
+    print(np.shape(lagged_adjusted_grand_ensemble_mean))
+    print(obs_nao_anom[6:])
+    print(lagged_adjusted_grand_ensemble_mean)
+    
+    # Calculate the 5-95% confidence intervals using compute_rmse_confidence_intervals
+    conf_interval_lower, conf_interval_upper = compute_rmse_confidence_intervals(obs_nao_anom, lagged_adjusted_grand_ensemble_mean, obs_time, model_time_lagged)
+
+    # Plot the grand ensemble mean with the ACC score in the legend
+    ax.plot(model_time_lagged, lagged_adjusted_grand_ensemble_mean[:-4], color="red", label=f"DCPP-A lagged + var. adjust (ACC: {acc_score:.2f})")
+
+    print(np.shape(model_time_lagged))
+    print(np.shape(adjusted_grand_ensemble_mean[3:-5]))
+    print(model_time_lagged)
+    print(list(model_times_by_model.values())[0][3:-5])
+    
+    # Plot the grand ensemble mean variance adjusted only
+    ax.plot(list(model_times_by_model.values())[0], adjusted_grand_ensemble_mean, color="orange", alpha=0.8, linestyle="--",label="DCPP-A var. adjust")
+
+    # Plot the 5-95% confidence intervals
+    ax.fill_between(model_time_lagged, conf_interval_lower, conf_interval_upper, color="red", alpha=0.2, label="5-95% confidence interval")
+
+    # Plot ERA5 data
+    ax.plot(obs_time[3:], obs_nao_anom[3:], color="black", label="ERA5")
+
+    ax.axhline(y=0, color="black", linestyle="-", linewidth=0.5)
+    ax.set_xlim([np.datetime64("1960"), np.datetime64("2020")])
+    ax.set_ylim([-10, 10])
+    ax.set_xlabel("Year")
+    ax.set_ylabel("NAO anomalies (hPa)")
+
+    # Set the title with the ACC and RPC scores
+    ax.set_title(f"NAO ensemble mean (lagged and adjusted) and individual members (ACC: {acc_score:.2f}, RPC: {rpc:.2f})")
+
+    # Add a legend in the bottom right corner
+    ax.legend(loc="lower right")
+
+    # Save the figure
+    # In the plots_dir directory
+    fig.savefig(os.path.join(plots_dir, "nao_ensemble_mean_and_individual_members_lagged_and_adjusted.png"), dpi=300)
 
     # Show the figure
     plt.show()
