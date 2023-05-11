@@ -197,5 +197,56 @@ def calculate_rpc(correlation_coefficient, forecast_members):
 # # Print the RPC value
 # print(rpc)
 
+# Two ways of calculating the uncertainty
+# First calculates the ensemble standard deviation
+# for each start date and then uses this to get the 
+# confidence intervals
+def calculate_confidence_intervals_sd(ensemble_members_array, lower_bound=5, upper_bound=95):
+    # Calculate the ensemble standard deviation for each start date
+    ensemble_sd = np.std(ensemble_members_array, axis=0)
+    
+    # Calculate the grand ensemble mean
+    grand_ensemble_mean = np.mean(ensemble_members_array, axis=0)
+
+    # Calculate the z-scores corresponding to the lower and upper bounds
+    z_score_lower = np.percentile(ensemble_sd, lower_bound)
+    z_score_upper = np.percentile(ensemble_sd, upper_bound)
+
+    # Calculate the 5% and 95% confidence intervals using the standard deviation and the grand ensemble mean
+    conf_interval_lower = grand_ensemble_mean - z_score_upper * ensemble_sd
+    conf_interval_upper = grand_ensemble_mean + z_score_upper * ensemble_sd
+
+    return conf_interval_lower, conf_interval_upper
+
+# Second way - more simple
+# Function to calculate the confidence intervals
+def calculate_confidence_intervals(ensemble_members_array, lower_bound=5, upper_bound=95):
+    conf_interval_lower = np.percentile(ensemble_members_array, lower_bound, axis=0)
+    conf_interval_upper = np.percentile(ensemble_members_array, upper_bound, axis=0)
+    return conf_interval_lower, conf_interval_upper
+
+# Function to lag the NAO data and create a new time
+# array
+def process_lagged_ensemble_mean(data, time_array, lag=4):
+    def lagged_ensemble_mean(data, lag):
+        # Initialize an empty array for the lagged ensemble mean
+        lagged_mean = np.empty(len(data) - lag + 1)
+
+        # Calculate the lagged ensemble mean for each year
+        for i in range(len(data) - lag + 1):
+            lagged_mean[i] = np.mean(data[i:i + lag])
+
+        return lagged_mean
+
+    # Calculate the lagged ensemble mean for the data
+    lagged_data_mean = lagged_ensemble_mean(data, lag)
+
+    # Calculate the corresponding model_time for the lagged data
+    model_time_lagged = time_array[:-lag][lag-1:]
+
+    return lagged_data_mean, model_time_lagged
+
+# Example usage
+# lagged_adjusted_var_mean, model_time_lagged = process_lagged_ensemble_mean(adjusted_var_model_nao_anom_raw, model_time_raw, lag=4)
 
 
