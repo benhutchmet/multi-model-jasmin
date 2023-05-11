@@ -8,6 +8,11 @@ import os
 import xarray as xr
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
+from scipy.stats import pearsonr
+
+# Also load the dictionaries from dictionaries.py
+from dictionaries import *
 
 # Function which loads each of the individual ensemble members \\
 # from their directory in JASMIN into a dictionary of datasets \\
@@ -386,3 +391,111 @@ def compute_rmse_confidence_intervals(obs_nao_anoms, adjusted_lagged_model_nao_a
 
     return conf_interval_lower, conf_interval_upper
 
+# Now write a plotting function
+def plot_ensemble_members_and_mean(models, model_times_by_model, model_nao_anoms_by_model, obs_nao_anom, obs_time):
+    """
+    Plot the ensemble mean of all members from all models and each of the ensemble members.
+
+    Parameters
+    ----------
+    models : dict
+        A dictionary containing a list of models.
+    model_times_by_model : dict
+        A dictionary containing model times for each model.
+    model_nao_anoms_by_model : dict
+        A dictionary containing model NAO anomalies for each model.
+    obs_nao_anom : numpy.ndarray
+        The observed NAO anomalies time series.
+    obs_time : numpy.ndarray
+        The observed time array.
+
+    Returns
+    -------
+    None
+    """
+
+    # Create a figure
+    fig, ax = plt.subplots(figsize=(10, 6))
+
+    # Initialize an empty list to store all ensemble members
+    all_ensemble_members = []
+
+    # Plot the ensemble members and calculate the ensemble mean for each model
+    ensemble_means = []
+
+    # Initialize a dictionary to store the count of ensemble members for each model
+    ensemble_member_counts = {}
+
+    # Iterate over the models
+    for model_name in models:
+        model_time = model_times_by_model[model_name]
+        model_nao_anom = model_nao_anoms_by_model[model_name]
+
+        # If the model_name is not in the dictionary, initialize its count to 0
+        if model_name not in ensemble_member_counts:
+            ensemble_member_counts[model_name] = 0
+
+        # Plot ensemble members
+        for member in model_nao_anom:
+            ax.plot(model_time, member, color="grey", alpha=0.1, linewidth=0.5)
+
+            # Add each member to the list of all ensemble members
+            all_ensemble_members.append(member)
+
+            # Increment the count of ensemble members for the current model
+            ensemble_member_counts[model_name] += 1
+
+        # Calculate and store ensemble mean
+        ensemble_means.append(ensemble_mean(model_nao_anom))
+
+    # Convert the ensemble_member_counts dictionary to a list of tuples
+    ensemble_member_counts_list = [(model, count) for model, count in ensemble_member_counts.items()]
+
+    # Convert the list of all ensemble members to a NumPy array
+    all_ensemble_members_array = np.array(all_ensemble_members)
+
+    # Calculate the grand ensemble mean using the new method
+    grand_ensemble_mean = np.mean(all_ensemble_members_array, axis=0)
+
+    # Calculate the ACC score using the function pearsonr_score
+    acc_score, p_value = pearsonr_score(obs_nao_anom, grand_ensemble_mean, (model_times_by_model.values())[0], obs_time, "1966-01-01","2010-12-31")
+
+    # Calculate the RPC score using the function calculate_rpc
+    rpc = calculate_rpc(acc_score, all_ensemble_members_array)
+
+    # Calculate the 5-95% confidence intervals using the two functions options
+    # First calculate_confidence_intervals_sd
+    # Then calculate_confidence_intervals
+    conf_interval_lower_sd, conf_interval_upper_sd = calculate_confidence_intervals_sd(obs_nao_anom, all_ensemble_members_array, lower_bound=5, upper_bound=95)
+    conf_interval_lower, conf_interval_upper = calculate_confidence_intervals(obs_nao_anom, all_ensemble_members_array, lower_bound=5, upper_bound=95)
+
+    # Plot the grand ensemble mean with the ACC score in the legend
+    ax.plot(list(model_times_by_model.values())[0], grand_ensemble_mean, color="red", label=f"DCPP-A (ACC: {acc_score:.2f})")
+
+    # Plot the 5-95% confidence intervals
+    ax.fill_between(list(model_times_by_model.values())[0], conf_interval_lower_sd, conf_interval_upper_sd, color="red", alpha=0.2, label="5-95% confidence interval (SD)")
+
+    # Plot the 5-95% confidence intervals
+    ax.fill_between(list(model_times_by_model.values())[0], conf_interval_lower, conf_interval_upper, color="blue", alpha=0.2, label="5-95% confidence interval (simple)")
+
+    # Plot ERA5 data
+    ax.plot(obs_time, obs_nao_anom, color="black", label="ERA5")
+
+    ax.axhline(y=0, color="black", linestyle="-", linewidth=0.5)
+    ax.set_xlim([np.datetime64("1960"), np.datetime64("2020")])
+    ax.set_ylim([-10, 10])
+    ax.set_xlabel("Reference Year")
+    ax.set_ylabel("NAO anomalies (hPa)")
+
+    # Set the title with the ACC score
+    ax.set_title(f"NAO ensemble mean and individual members (ACC: {acc_score:.2f})")
+
+    # Add a legend in the bottom right corner
+    ax.legend(loc="lower right")
+
+    # Save the figure
+    # In the plots_dir directory
+    fig.savefig(os.path.join(plots_dir, "nao_ensemble_mean_and_individual_members.png"), dpi=300)
+
+    # Show the figure
+    plt.show()
