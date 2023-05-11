@@ -15,3 +15,6 @@ JASMIN_ind_dir = "/home/users/benhutch/multi-model/ind-members"
 # File path for the observations from ERA5
 # Processed using CDO manipulation
 obs = "/home/users/benhutch/ERA5_psl/nao-anomaly/nao-anomaly-ERA5.8yrRM.nc"
+
+# Directory for plots
+plots_dir = "/home/users/benhutch/multi-model/plots/"
