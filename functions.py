@@ -513,11 +513,11 @@ def plot_ensemble_members_and_mean(models, model_times_by_model, model_nao_anoms
     ax.axhline(y=0, color="black", linestyle="-", linewidth=0.5)
     ax.set_xlim([np.datetime64("1960"), np.datetime64("2020")])
     ax.set_ylim([-10, 10])
-    ax.set_xlabel("Reference Year")
+    ax.set_xlabel("Year")
     ax.set_ylabel("NAO anomalies (hPa)")
 
-    # Set the title with the ACC score
-    ax.set_title(f"NAO ensemble mean and individual members (ACC: {acc_score:.2f})")
+    # Set the title with the ACC and RPC scores
+    ax.set_title(f"NAO ensemble mean and individual members (ACC: {acc_score:.2f}, RPC: {rpc:.2f})")
 
     # Add a legend in the bottom right corner
     ax.legend(loc="lower right")
@@ -525,6 +525,121 @@ def plot_ensemble_members_and_mean(models, model_times_by_model, model_nao_anoms
     # Save the figure
     # In the plots_dir directory
     fig.savefig(os.path.join(plots_dir, "nao_ensemble_mean_and_individual_members.png"), dpi=300)
+
+    # Show the figure
+    plt.show()
+
+def plot_ensemble_members_and_lagged_adjusted_mean(models, model_times_by_model, model_nao_anoms_by_model, obs_nao_anom, obs_time, lag=4):
+    """
+    Plot the ensemble mean of all members from all models and each of the ensemble members, with lagged and adjusted variance applied to the grand ensemble mean.
+
+    Parameters
+    ----------
+    models : dict
+        A dictionary containing a list of models.
+    model_times_by_model : dict
+        A dictionary containing model times for each model.
+    model_nao_anoms_by_model : dict
+        A dictionary containing model NAO anomalies for each model.
+    obs_nao_anom : numpy.ndarray
+        The observed NAO anomalies time series.
+    obs_time : numpy.ndarray
+        The observed time array.
+    lag : int, optional, default: 4
+        The number of years to lag the grand ensemble mean by.
+
+    Returns
+    -------
+    None
+    """
+
+    # Create a figure
+    fig, ax = plt.subplots(figsize=(10, 6))
+
+    # Initialize an empty list to store all ensemble members
+    all_ensemble_members = []
+
+    # Plot the ensemble members and calculate the ensemble mean for each model
+    ensemble_means = []
+
+    # Initialize a dictionary to store the count of ensemble members for each model
+    ensemble_member_counts = {}
+
+    # Iterate over the models
+    for model_name in models:
+        model_time = model_times_by_model[model_name]
+        model_nao_anom = model_nao_anoms_by_model[model_name]
+
+        # If the model_name is not in the dictionary, initialize its count to 0
+        if model_name not in ensemble_member_counts:
+            ensemble_member_counts[model_name] = 0
+
+        # Plot ensemble members
+        for member in model_nao_anom:
+            ax.plot(model_time, member, color="grey", alpha=0.1, linewidth=0.5)
+
+            # Add each member to the list of all ensemble members
+            all_ensemble_members.append(member)
+
+            # Increment the count of ensemble members for the current model
+            ensemble_member_counts[model_name] += 1
+
+        # Calculate and store ensemble mean
+        ensemble_means.append(ensemble_mean(model_nao_anom))
+
+    # Convert the ensemble_member_counts dictionary to a list of tuples
+    ensemble_member_counts_list = [(model, count) for model, count in ensemble_member_counts.items()]
+
+    # Convert the list of all ensemble members to a NumPy array
+    all_ensemble_members_array = np.array(all_ensemble_members)
+
+    # Calculate the grand ensemble mean using the new method
+    grand_ensemble_mean = np.mean(all_ensemble_members_array, axis=0)
+
+    # Apply lagging and variance adjustment to the grand ensemble mean
+    lagged_grand_ensemble_mean, model_time_lagged = process_lagged_ensemble_mean(grand_ensemble_mean, list(model_times_by_model.values())[0], lag)
+    lagged_adjusted_grand_ensemble_mean = adjust_variance(lagged_grand_ensemble_mean)
+
+    # Also just apply the variance adjustment to the grand ensemble mean
+    adjusted_grand_ensemble_mean = adjust_variance(grand_ensemble_mean)
+
+    # Calculate the ACC score using the function pearsonr_score with the lagged and adjusted grand ensemble mean
+    # For the skillful period
+    acc_score, p_value = pearsonr_score(obs_nao_anom, lagged_adjusted_grand_ensemble_mean, model_time_lagged, obs_time, "1966-01-01", "2010-12-31") 
+
+    # Calculate the RPC score using the function calculate_rpc
+    rpc = calculate_rpc(acc_score, all_ensemble_members_array)
+
+    # Calculate the 5-95% confidence intervals using compute_rmse_confidence_intervals
+    conf_interval_lower, conf_interval_upper = compute_rmse_confidence_intervals(obs_nao_anom, lagged_adjusted_grand_ensemble_mean)
+
+    # Plot the grand ensemble mean with the ACC score in the legend
+    ax.plot(model_time_lagged, lagged_adjusted_grand_ensemble_mean, color="red", label=f"DCPP-A lagged + var. adjust (ACC: {acc_score:.2f})")
+
+    # Plot the grand ensemble mean variance adjusted only
+    ax.plot(model_time_lagged, adjusted_grand_ensemble_mean, color="orange", alpha=0.4, linestyle="--",label="DCPP-A var. adjust")
+
+    # Plot the 5-95% confidence intervals
+    ax.fill_between(model_time_lagged, conf_interval_lower, conf_interval_upper, color="red", alpha=0.2, label="5-95% confidence interval")
+
+    # Plot ERA5 data
+    ax.plot(obs_time[3:], obs_nao_anom[3:], color="black", label="ERA5")
+
+    ax.axhline(y=0, color="black", linestyle="-", linewidth=0.5)
+    ax.set_xlim([np.datetime64("1960"), np.datetime64("2020")])
+    ax.set_ylim([-10, 10])
+    ax.set_xlabel("Year")
+    ax.set_ylabel("NAO anomalies (hPa)")
+
+    # Set the title with the ACC and RPC scores
+    ax.set_title(f"NAO ensemble mean (lagged and adjusted) and individual members (ACC: {acc_score:.2f}, RPC: {rpc:.2f})")
+
+    # Add a legend in the bottom right corner
+    ax.legend(loc="lower right")
+
+    # Save the figure
+    # In the plots_dir directory
+    fig.savefig(os.path.join(plots_dir, "nao_ensemble_mean_and_individual_members_lagged_and_adjusted.png"), dpi=300)
 
     # Show the figure
     plt.show()
