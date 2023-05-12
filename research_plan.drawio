@@ -1,0 +1,293 @@
+<mxfile host="app.diagrams.net" modified="2023-05-12T09:08:31.263Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/112.0" etag="kw9g6QkyzYhVmgBYm2Jm" version="21.2.9" type="device">
+  <diagram name="Page-1" id="C7xBqoRl-2ZH1QGe7lWn">
+    <mxGraphModel dx="1850" dy="1098" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="MYsyzhye_xoifdE90jc8-39" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0;exitDx=0;exitDy=0;entryX=0.75;entryY=1;entryDx=0;entryDy=0;fontSize=12;startSize=8;endSize=8;" parent="1" source="MYsyzhye_xoifdE90jc8-1" target="MYsyzhye_xoifdE90jc8-38" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-1" value="&lt;div&gt;Decadal forecasting research&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;" parent="1" vertex="1">
+          <mxGeometry x="131" y="168" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-2" value="" style="endArrow=classic;html=1;rounded=0;fontSize=12;startSize=8;endSize=8;curved=1;exitX=1;exitY=0;exitDx=0;exitDy=0;" parent="1" source="MYsyzhye_xoifdE90jc8-1" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="242" y="228" as="sourcePoint" />
+            <mxPoint x="412" y="52" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="294" y="141" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-3" value="Replicating Doug&#39;s plot (fig. 2)" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;" parent="1" vertex="1">
+          <mxGeometry x="416" y="10" width="134" height="66" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-33" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=12;startSize=8;endSize=8;" parent="1" source="MYsyzhye_xoifdE90jc8-4" target="MYsyzhye_xoifdE90jc8-8" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-36" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.75;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=12;startSize=8;endSize=8;" parent="1" source="MYsyzhye_xoifdE90jc8-4" target="MYsyzhye_xoifdE90jc8-34" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-4" value="Raw ensemble" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;" parent="1" vertex="1">
+          <mxGeometry x="599" y="-152" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-37" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=12;startSize=8;endSize=8;" parent="1" source="MYsyzhye_xoifdE90jc8-5" target="MYsyzhye_xoifdE90jc8-35" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-5" value="Lagged + var. adjust" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;" parent="1" vertex="1">
+          <mxGeometry x="604" y="10" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-6" value="" style="endArrow=classic;html=1;rounded=0;fontSize=12;startSize=8;endSize=8;curved=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" target="MYsyzhye_xoifdE90jc8-4" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="540" y="10" as="sourcePoint" />
+            <mxPoint x="590" y="-40" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-7" value="" style="endArrow=classic;html=1;rounded=0;fontSize=12;startSize=8;endSize=8;curved=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" target="MYsyzhye_xoifdE90jc8-5" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="550" y="20" as="sourcePoint" />
+            <mxPoint x="606" y="-42" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-8" value="Complete?" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;" parent="1" vertex="1">
+          <mxGeometry x="802" y="-178" width="104" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-9" value="CI appear too large" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;" parent="1" vertex="1">
+          <mxGeometry x="759" y="58" width="104" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-10" value="Complete?" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;" parent="1" vertex="1">
+          <mxGeometry x="774" y="2" width="104" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-11" value="" style="endArrow=classic;html=1;rounded=0;fontSize=12;startSize=8;endSize=8;curved=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" target="MYsyzhye_xoifdE90jc8-10" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="722" y="33" as="sourcePoint" />
+            <mxPoint x="776" y="53" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-12" value="" style="endArrow=classic;html=1;rounded=0;fontSize=12;startSize=8;endSize=8;curved=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" target="MYsyzhye_xoifdE90jc8-9" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="725" y="34" as="sourcePoint" />
+            <mxPoint x="784" y="32" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-15" value="&lt;div&gt;NAO-Matched&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;" parent="1" vertex="1">
+          <mxGeometry x="604" y="96" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-16" value="" style="endArrow=classic;html=1;rounded=0;fontSize=12;startSize=8;endSize=8;curved=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=1;exitY=1;exitDx=0;exitDy=0;" parent="1" source="MYsyzhye_xoifdE90jc8-3" target="MYsyzhye_xoifdE90jc8-15" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="560" y="30" as="sourcePoint" />
+            <mxPoint x="614" y="50" as="targetPoint" />
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-17" value="&lt;font color=&quot;#ff3333&quot;&gt;Waiting for Doug code&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;" parent="1" vertex="1">
+          <mxGeometry x="771" y="130" width="104" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-18" value="" style="endArrow=classic;html=1;rounded=0;fontSize=12;startSize=8;endSize=8;curved=1;" parent="1" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="725" y="120" as="sourcePoint" />
+            <mxPoint x="770" y="151" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-26" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=12;startSize=8;endSize=8;" parent="1" source="MYsyzhye_xoifdE90jc8-19" target="MYsyzhye_xoifdE90jc8-22" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-70" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;fontSize=12;startSize=8;endSize=8;" parent="1" source="MYsyzhye_xoifdE90jc8-19" target="MYsyzhye_xoifdE90jc8-68" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-71" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=12;startSize=8;endSize=8;" parent="1" source="MYsyzhye_xoifdE90jc8-19" target="MYsyzhye_xoifdE90jc8-69" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-87" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.25;exitY=1;exitDx=0;exitDy=0;fontSize=12;startSize=8;endSize=8;" parent="1" source="MYsyzhye_xoifdE90jc8-19" target="MYsyzhye_xoifdE90jc8-86" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-19" value="&lt;div&gt;Replicating Doug&#39;s plot (fig. 1)&lt;/div&gt;&lt;div&gt;(MSLP skill maps)&lt;br&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;" parent="1" vertex="1">
+          <mxGeometry x="421" y="277" width="134" height="66" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-20" value="" style="endArrow=classic;html=1;rounded=0;fontSize=12;startSize=8;endSize=8;curved=1;exitX=1;exitY=0;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" target="MYsyzhye_xoifdE90jc8-19" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="251" y="224" as="sourcePoint" />
+            <mxPoint x="412" y="108" as="targetPoint" />
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-25" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;fontSize=12;startSize=8;endSize=8;" parent="1" source="MYsyzhye_xoifdE90jc8-22" target="MYsyzhye_xoifdE90jc8-23" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-28" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.75;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=12;startSize=8;endSize=8;" parent="1" source="MYsyzhye_xoifdE90jc8-22" target="MYsyzhye_xoifdE90jc8-27" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-32" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=12;startSize=8;endSize=8;" parent="1" source="MYsyzhye_xoifdE90jc8-22" target="MYsyzhye_xoifdE90jc8-31" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-22" value="Replicate MSLP skill map NA" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;" parent="1" vertex="1">
+          <mxGeometry x="604" y="247" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-23" value="&lt;div&gt;Winter in paper&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;" parent="1" vertex="1">
+          <mxGeometry x="783" y="209" width="99" height="38" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-30" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=12;startSize=8;endSize=8;" parent="1" source="MYsyzhye_xoifdE90jc8-27" target="MYsyzhye_xoifdE90jc8-29" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-27" value="Summer/Autumn (?)" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;" parent="1" vertex="1">
+          <mxGeometry x="781" y="267" width="127" height="53" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-29" value="Skill for East Atlantic pattern?" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;" parent="1" vertex="1">
+          <mxGeometry x="984" y="272" width="127" height="53" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-31" value="Data already on JASMIN" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;" parent="1" vertex="1">
+          <mxGeometry x="790" y="340" width="121" height="57" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-34" value="&lt;font color=&quot;#ff0000&quot;&gt;Individual models?&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;" parent="1" vertex="1">
+          <mxGeometry x="812" y="-115" width="104" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-35" value="&lt;font color=&quot;#ff0000&quot;&gt;Individual models?&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;" parent="1" vertex="1">
+          <mxGeometry x="771" y="-47" width="104" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-41" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;fontSize=12;startSize=8;endSize=8;" parent="1" source="MYsyzhye_xoifdE90jc8-38" target="MYsyzhye_xoifdE90jc8-40" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-43" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.25;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;fontSize=12;startSize=8;endSize=8;" parent="1" source="MYsyzhye_xoifdE90jc8-38" target="MYsyzhye_xoifdE90jc8-42" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-62" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontSize=12;startSize=8;endSize=8;" parent="1" source="MYsyzhye_xoifdE90jc8-38" target="MYsyzhye_xoifdE90jc8-61" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-38" value="Improving upon Moemken paper (2016)" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;" parent="1" vertex="1">
+          <mxGeometry x="-193" y="30" width="136" height="68" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-40" value="&lt;font style=&quot;font-size: 11px;&quot;&gt;Decadal predictability of regional scale wind speed and wind energy potentials over central europe&lt;br&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;" parent="1" vertex="1">
+          <mxGeometry x="-202" y="-120" width="145" height="82" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-45" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.25;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;fontSize=12;startSize=8;endSize=8;" parent="1" source="MYsyzhye_xoifdE90jc8-42" target="MYsyzhye_xoifdE90jc8-44" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-60" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontSize=12;startSize=8;endSize=8;" parent="1" source="MYsyzhye_xoifdE90jc8-42" target="MYsyzhye_xoifdE90jc8-59" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-42" value="Decadal forecast/hindcast of large-scale mean wind" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;" parent="1" vertex="1">
+          <mxGeometry x="-409" y="-18" width="167" height="73" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-53" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0;exitDx=0;exitDy=0;fontSize=12;startSize=8;endSize=8;" parent="1" source="MYsyzhye_xoifdE90jc8-44" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="-608.3333333333334" y="-148" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-54" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.25;exitDx=0;exitDy=0;fontSize=12;startSize=8;endSize=8;" parent="1" source="MYsyzhye_xoifdE90jc8-44" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="-609.6666666666666" y="-86.66666666666674" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-55" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.25;entryDx=0;entryDy=0;fontSize=12;startSize=8;endSize=8;" parent="1" source="MYsyzhye_xoifdE90jc8-44" target="MYsyzhye_xoifdE90jc8-48" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-56" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.75;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;fontSize=12;startSize=8;endSize=8;" parent="1" source="MYsyzhye_xoifdE90jc8-44" target="MYsyzhye_xoifdE90jc8-49" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-57" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;fontSize=12;startSize=8;endSize=8;" parent="1" source="MYsyzhye_xoifdE90jc8-44" target="MYsyzhye_xoifdE90jc8-50" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-58" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.25;exitY=1;exitDx=0;exitDy=0;fontSize=12;startSize=8;endSize=8;" parent="1" source="MYsyzhye_xoifdE90jc8-44" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="-597.6666666666666" y="105.33333333333326" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-44" value="&lt;div&gt;Forecast periods&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;" parent="1" vertex="1">
+          <mxGeometry x="-571" y="-78" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-46" value="Year 1-3" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;" parent="1" vertex="1">
+          <mxGeometry x="-716" y="-175.5" width="103" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-47" value="&lt;div&gt;Year 4-6&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;" parent="1" vertex="1">
+          <mxGeometry x="-713" y="-113.5" width="97" height="37" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-48" value="&lt;div&gt;Year 1-4&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;" parent="1" vertex="1">
+          <mxGeometry x="-711" y="-59" width="95" height="29" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-49" value="&lt;font color=&quot;#ff3333&quot;&gt;Year 2-5&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;" parent="1" vertex="1">
+          <mxGeometry x="-702" y="-11" width="86" height="33" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-50" value="&lt;font color=&quot;#ff0000&quot;&gt;Year 6-9&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;" parent="1" vertex="1">
+          <mxGeometry x="-697" y="37" width="81" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-51" value="&lt;font color=&quot;#ff0000&quot;&gt;Year 2-9&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;" parent="1" vertex="1">
+          <mxGeometry x="-697" y="87" width="96" height="36" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-59" value="&lt;div&gt;Improve raw output with large ensemble&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;" parent="1" vertex="1">
+          <mxGeometry x="-560" y="130" width="127" height="71" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-64" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontSize=12;startSize=8;endSize=8;" parent="1" source="MYsyzhye_xoifdE90jc8-61" target="MYsyzhye_xoifdE90jc8-63" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-61" value="&lt;div&gt;Complicated SDD regionalization&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;" parent="1" vertex="1">
+          <mxGeometry x="-358" y="152" width="148" height="57" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-63" value="Correlation w/decadal forecast of NAO as predictor?" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;" parent="1" vertex="1">
+          <mxGeometry x="-561" y="272" width="163" height="76" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-66" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0;exitDx=0;exitDy=0;fontSize=12;startSize=8;endSize=8;" parent="1" source="MYsyzhye_xoifdE90jc8-65" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="-564.3333333333334" y="164" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-67" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=12;startSize=8;endSize=8;" parent="1" source="MYsyzhye_xoifdE90jc8-65" target="MYsyzhye_xoifdE90jc8-63" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-65" value="Compare skill of these" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;" parent="1" vertex="1">
+          <mxGeometry x="-755" y="218" width="117" height="59" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-74" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=12;startSize=8;endSize=8;" parent="1" source="MYsyzhye_xoifdE90jc8-68" target="MYsyzhye_xoifdE90jc8-72" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-80" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;fontSize=12;startSize=8;endSize=8;" parent="1" source="MYsyzhye_xoifdE90jc8-68" target="MYsyzhye_xoifdE90jc8-77" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-68" value="&lt;div&gt;Temperature skill map North Atlantic&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;" parent="1" vertex="1">
+          <mxGeometry x="591" y="370" width="140" height="71" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-76" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;fontSize=12;startSize=8;endSize=8;" parent="1" source="MYsyzhye_xoifdE90jc8-69" target="MYsyzhye_xoifdE90jc8-73" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-81" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=12;startSize=8;endSize=8;" parent="1" source="MYsyzhye_xoifdE90jc8-69" target="MYsyzhye_xoifdE90jc8-77" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-69" value="Wind speed skill map north atlantic" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;" parent="1" vertex="1">
+          <mxGeometry x="584" y="519" width="140" height="71" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-72" value="&lt;font color=&quot;#ff0000&quot;&gt;Download temp data to JASMIN?&lt;br&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;" parent="1" vertex="1">
+          <mxGeometry x="805" y="415" width="140" height="71" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-73" value="&lt;div&gt;&lt;font color=&quot;#ff0000&quot;&gt;Download wind speed data to JASMIN?&lt;/font&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;" parent="1" vertex="1">
+          <mxGeometry x="812" y="595" width="140" height="71" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-84" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=12;startSize=8;endSize=8;" parent="1" source="MYsyzhye_xoifdE90jc8-77" target="MYsyzhye_xoifdE90jc8-82" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-85" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.75;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=12;startSize=8;endSize=8;" parent="1" source="MYsyzhye_xoifdE90jc8-77" target="MYsyzhye_xoifdE90jc8-83" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-77" value="Seasonal variations?" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;" parent="1" vertex="1">
+          <mxGeometry x="815" y="510" width="127" height="53" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-82" value="&lt;div&gt;Winter first&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;" parent="1" vertex="1">
+          <mxGeometry x="995" y="481" width="108" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-83" value="&lt;div&gt;Then summer and Autumn&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;" parent="1" vertex="1">
+          <mxGeometry x="991" y="549" width="118" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-89" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.75;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;fontSize=12;startSize=8;endSize=8;" parent="1" source="MYsyzhye_xoifdE90jc8-86" target="MYsyzhye_xoifdE90jc8-88" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-90" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0;exitDx=0;exitDy=0;entryX=0;entryY=0.75;entryDx=0;entryDy=0;fontSize=12;startSize=8;endSize=8;" parent="1" source="MYsyzhye_xoifdE90jc8-86" target="MYsyzhye_xoifdE90jc8-77" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-86" value="Incoming solar radiation skill map north atlantic" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;" parent="1" vertex="1">
+          <mxGeometry x="531" y="633" width="140" height="71" as="geometry" />
+        </mxCell>
+        <mxCell id="MYsyzhye_xoifdE90jc8-88" value="&lt;div&gt;&lt;font color=&quot;#ff0000&quot;&gt;Download ISR data to JASMIN?&lt;/font&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;" parent="1" vertex="1">
+          <mxGeometry x="671" y="731" width="132" height="62" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
