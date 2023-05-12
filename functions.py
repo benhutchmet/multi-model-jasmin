@@ -868,9 +868,12 @@ def plot_subplots_ensemble_members_and_lagged_adjusted_mean(models, model_times_
     # Show the figure
     plt.show()
 
-# Define a function which plots the impact of ensemble size on the ACC score
-# How does skill increase with ensemble size?
-def calculate_acc_by_ensemble_size(models, model_nao_anoms_by_model, obs_nao_anom, step_size=1, num_samples=1000):
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.stats import pearsonr
+from sklearn.utils import resample
+
+def calculate_acc_by_ensemble_size(models, model_nao_anoms_by_model, obs_nao_anom, step_size=10, num_samples=100):
     """
     Calculate ACC scores as the ensemble size increases and plot them.
 
@@ -926,13 +929,15 @@ def calculate_acc_by_ensemble_size(models, model_nao_anoms_by_model, obs_nao_ano
             ensemble_mean = np.mean(sample, axis=0)
 
             # Calculate the ACC score and append it to the list
-            acc_score, _ = pearsonr(obs_nao_anom, ensemble_mean)
+            # 1966-2010 indexed
+            acc_score, _ = pearsonr(obs_nao_anom[3:-5], ensemble_mean[:-9])
             current_acc_scores.append(acc_score)
 
         # Calculate the mean ACC score for the current ensemble size
         mean_acc_score = np.mean(current_acc_scores)
 
-        # Append the ensemble size and its corresponding mean ACC score to the lists        
+        # Append the ensemble size and its corresponding mean ACC score to the lists
+        # Append the ensemble size and its corresponding mean ACC score to the lists
         ensemble_sizes.append(ensemble_size)
         acc_scores.append(mean_acc_score)
 

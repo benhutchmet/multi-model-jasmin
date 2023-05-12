@@ -10,6 +10,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from scipy.stats import pearsonr
+from sklearn.utils import resample
 
 # Also load the dictionaries from dictionaries.py
 from dictionaries import *
@@ -867,6 +868,90 @@ def plot_subplots_ensemble_members_and_lagged_adjusted_mean(models, model_times_
     # Show the figure
     plt.show()
 
-       
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.stats import pearsonr
+from sklearn.utils import resample
+
+def calculate_acc_by_ensemble_size(models, model_nao_anoms_by_model, obs_nao_anom, step_size=10, num_samples=100):
+    """
+    Calculate ACC scores as the ensemble size increases and plot them.
+
+    Parameters
+    ----------
+    models : dict
+        A dictionary containing a list of models.
+    model_nao_anoms_by_model : dict
+        A dictionary containing model NAO anomalies for each model.
+    obs_nao_anom : numpy.ndarray
+        The observed NAO anomalies time series.
+    step_size : int, optional
+        The step size for increasing the ensemble size (default is 1).
+    num_samples : int, optional
+        The number of random samples to take for each ensemble size (default is 1000).
+
+    Returns
+    -------
+    None
+    """
+
+    # Initialize an empty list to store all ensemble members
+    all_ensemble_members = []
+
+    # Iterate over the models
+    for model_name in models:
+        model_nao_anom = model_nao_anoms_by_model[model_name]
+
+        # Add each member to the list of all ensemble members
+        all_ensemble_members.extend(model_nao_anom)
+
+    # Convert the list of all ensemble members to a NumPy array
+    all_ensemble_members_array = np.array(all_ensemble_members)
+
+    # The total number of ensemble members
+    total_ensemble_members = len(all_ensemble_members)
+
+    # Initialize lists to store the ensemble sizes and their corresponding ACC scores
+    ensemble_sizes = []
+    acc_scores = []
+
+    # Iterate over the ensemble sizes from 1 to the total number of ensemble members
+    for ensemble_size in range(1, total_ensemble_members + 1, step_size):
+        # Initialize a list to store the ACC scores for the current ensemble size
+        current_acc_scores = []
+
+        # Draw num_samples random samples of size ensemble_size and calculate ACC for each sample
+        for _ in range(num_samples):
+            # Draw a random sample of ensemble members
+            sample = resample(all_ensemble_members_array, n_samples=ensemble_size)
+
+            # Calculate the ensemble mean
+            ensemble_mean = np.mean(sample, axis=0)
+
+            # Calculate the ACC score and append it to the list
+            # 1966-2010 indexed
+            acc_score, _ = pearsonr(obs_nao_anom[3:-5], ensemble_mean[:-9])
+            current_acc_scores.append(acc_score)
+
+        # Calculate the mean ACC score for the current ensemble size
+        mean_acc_score = np.mean(current_acc_scores)
+
+        # Append the ensemble size and its corresponding mean ACC score to the lists
+        # Append the ensemble size and its corresponding mean ACC score to the lists
+        ensemble_sizes.append(ensemble_size)
+        acc_scores.append(mean_acc_score)
+
+    # Create a figure
+    fig, ax = plt.subplots(figsize=(10, 6))
+
+    # Plot the ACC scores against the ensemble sizes
+    ax.plot(ensemble_sizes, acc_scores, marker='o', linestyle='-')
+
+    ax.set_xlabel("Number of ensemble members")
+    ax.set_ylabel("ACC score")
+    ax.set_title("ACC score by ensemble size")
+
+    # Show the figure
+    plt.show()
 
 
