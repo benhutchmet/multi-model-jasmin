@@ -873,7 +873,7 @@ import matplotlib.pyplot as plt
 from scipy.stats import pearsonr
 from sklearn.utils import resample
 
-def calculate_acc_by_ensemble_size(models, model_nao_anoms_by_model, obs_nao_anom, step_size=10, num_samples=100):
+def calculate_acc_by_ensemble_size(models, model_nao_anoms_by_model, obs_nao_anom, step_size=2, num_samples=400):
     """
     Calculate ACC scores as the ensemble size increases and plot them.
 
@@ -946,6 +946,9 @@ def calculate_acc_by_ensemble_size(models, model_nao_anoms_by_model, obs_nao_ano
 
     # Plot the ACC scores against the ensemble sizes
     ax.plot(ensemble_sizes, acc_scores, marker='o', linestyle='-')
+
+    # Save the figure
+    fig.savefig(os.path.join(plots_dir, "members_and_skill.png"), dpi=300)
 
     ax.set_xlabel("Number of ensemble members")
     ax.set_ylabel("ACC score")
