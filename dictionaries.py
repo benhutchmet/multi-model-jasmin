@@ -16,5 +16,8 @@ JASMIN_ind_dir = "/home/users/benhutch/multi-model/ind-members"
 # Processed using CDO manipulation
 obs = "/home/users/benhutch/ERA5_psl/nao-anomaly/nao-anomaly-ERA5.8yrRM.nc"
 
+# long obs
+obs_long = "/home/users/benhutch/multi-model/multi-model-jasmin/NAO_index_8yrRM_long.nc"
+
 # Directory for plots
 plots_dir = "/home/users/benhutch/multi-model/plots/"

@@ -128,11 +128,14 @@ def process_observations(obs):
     obs_psl = obs["var151"]
     obs_time = obs_psl["time"].values
 
+    print(np.shape(obs_psl))
+    print(np.shape(obs_time))
+
     # Set the type for the time variable
     obs_time = obs_time.astype("datetime64[Y]")
 
     # Process the obs data from Pa to hPa
-    obs_nao_anom = obs_psl[:, 0, 0] / 100
+    obs_nao_anom = obs_psl[:] / 100
 
     return obs_nao_anom, obs_time
 
@@ -522,11 +525,12 @@ def plot_ensemble_members_and_mean(models, model_times_by_model, model_nao_anoms
     # Plot the grand ensemble mean with the ACC score in the legend
     ax.plot(list(model_times_by_model.values())[0], grand_ensemble_mean, color="red", label=f"DCPP-A (ACC: {acc_score:.2f})")
 
+
     # Plot the 5-95% confidence intervals
     ax.fill_between(list(model_times_by_model.values())[0], conf_interval_lower, conf_interval_upper, color="red", alpha=0.2, label="5-95% confidence interval")
 
     # Plot ERA5 data
-    ax.plot(obs_time[3:], obs_nao_anom[3:], color="black", label="ERA5")
+    ax.plot(obs_time[2:], obs_nao_anom[2:], color="black", label="ERA5")
 
     ax.axhline(y=0, color="black", linestyle="-", linewidth=0.5)
     ax.set_xlim([np.datetime64("1960"), np.datetime64("2020")])
@@ -688,7 +692,11 @@ def plot_ensemble_members_and_obs(models, model_times_by_model, model_nao_anoms_
 
     # Plot the randomly selected ensemble members
     for member in random_ensemble_members:
-        ax.plot(model_time, member, color="grey", alpha=0.1, linewidth=0.5)
+        ax.plot(model_time, member, color="red", alpha=0.4, linewidth=0.8)
+
+    # print the number of ensemble members
+    # in the top right corner
+    ax.text(0.98, 0.98, f"Number of ensemble members: {no_ensemble_members}", transform=ax.transAxes, ha="right", va="top")
 
     # optionally plot the observations
     if plot_obs:
@@ -830,7 +838,7 @@ def plot_ensemble_members_and_lagged_adjusted_mean(models, model_times_by_model,
     ax.fill_between(model_time_lagged, conf_interval_lower, conf_interval_upper, color="red", alpha=0.2, label="5-95% confidence interval")
 
     # Plot ERA5 data
-    ax.plot(obs_time[3:], obs_nao_anom[3:], color="black", label="ERA5")
+    ax.plot(obs_time[2:], obs_nao_anom[2:], color="black", label="ERA5")
 
     ax.axhline(y=0, color="black", linestyle="-", linewidth=0.5)
     ax.set_xlim([np.datetime64("1960"), np.datetime64("2020")])
@@ -917,7 +925,7 @@ def plot_subplots_ensemble_members_and_mean(models, model_times_by_model, model_
         ax.fill_between(model_time, conf_interval_lower, conf_interval_upper, color="red", alpha=0.2)
 
         # Plot ERA5 data
-        ax.plot(obs_time[3:], obs_nao_anom[3:], color="black", label="ERA5")
+        ax.plot(obs_time[2:], obs_nao_anom[2:], color="black", label="ERA5")
 
         ax.axhline(y=0, color="black", linestyle="-", linewidth=0.5)
         ax.set_xlim([np.datetime64("1960"), np.datetime64("2020")])
@@ -1017,7 +1025,7 @@ def plot_subplots_ensemble_members_and_lagged_adjusted_mean(models, model_times_
         ax.fill_between(model_time_lagged, conf_interval_lower, conf_interval_upper, color="red", alpha=0.2)
 
         # Plot ERA5 data
-        ax.plot(obs_time[3:], obs_nao_anom[3:], color="black", label="ERA5")
+        ax.plot(obs_time[2:], obs_nao_anom[2:], color="black", label="ERA5")
 
         ax.axhline(y=0, color="black", linestyle="-", linewidth=0.5)
         ax.set_xlim([np.datetime64("1960"), np.datetime64("2020")])

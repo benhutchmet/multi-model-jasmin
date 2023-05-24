@@ -128,11 +128,14 @@ def process_observations(obs):
     obs_psl = obs["var151"]
     obs_time = obs_psl["time"].values
 
+    print(np.shape(obs_psl))
+    print(np.shape(obs_time))
+
     # Set the type for the time variable
     obs_time = obs_time.astype("datetime64[Y]")
 
     # Process the obs data from Pa to hPa
-    obs_nao_anom = obs_psl[:, 0, 0] / 100
+    obs_nao_anom = obs_psl[:] / 100
 
     return obs_nao_anom, obs_time
 
@@ -527,7 +530,7 @@ def plot_ensemble_members_and_mean(models, model_times_by_model, model_nao_anoms
     ax.fill_between(list(model_times_by_model.values())[0], conf_interval_lower, conf_interval_upper, color="red", alpha=0.2, label="5-95% confidence interval")
 
     # Plot ERA5 data
-    ax.plot(obs_time[3:], obs_nao_anom[3:], color="black", label="ERA5")
+    ax.plot(obs_time[2:], obs_nao_anom[2:], color="black", label="ERA5")
 
     ax.axhline(y=0, color="black", linestyle="-", linewidth=0.5)
     ax.set_xlim([np.datetime64("1960"), np.datetime64("2020")])
@@ -547,6 +550,186 @@ def plot_ensemble_members_and_mean(models, model_times_by_model, model_nao_anoms
 
     # Show the figure
     plt.show()
+
+# Define a function that will plot a randomly selected group of ensemble members and plot the average
+def plot_random_ensemble_members_and_stats(models, model_times_by_model, model_nao_anoms_by_model, obs_nao_anom, obs_time, no_ensemble_members=10):
+    """
+    Plot randomly selected ensemble members, the ensemble mean of these members, and observations, along with ACC and RPC scores.
+
+    Parameters
+    ----------
+    models : dict
+        A dictionary containing a list of models.
+    model_times_by_model : dict
+        A dictionary containing model times for each model.
+    model_nao_anoms_by_model : dict
+        A dictionary containing model NAO anomalies for each model.
+    obs_nao_anom : numpy.ndarray
+        The observed NAO anomalies time series.
+    obs_time : numpy.ndarray
+        The observed time array.
+    no_ensemble_members : int, optional
+        The number of ensemble members to randomly select. The default is 10.
+
+    Returns
+    -------
+    None
+    """
+
+    fig, ax = plt.subplots(figsize=(10, 6))
+
+    all_ensemble_members = []
+
+    for model_name in models:
+        model_time = model_times_by_model[model_name]
+        model_nao_anom = model_nao_anoms_by_model[model_name]
+
+        for member in model_nao_anom:
+            all_ensemble_members.append(member)
+
+    all_ensemble_members_array = np.array(all_ensemble_members)
+
+    # Randomly select no_ensemble_members ensemble members
+    random_indices = np.random.choice(range(len(all_ensemble_members_array)), no_ensemble_members, replace=False)
+    random_ensemble_members = all_ensemble_members_array[random_indices]
+
+    for member in random_ensemble_members:
+        ax.plot(model_time, member, color="grey", alpha=0.1, linewidth=0.5)
+
+    # Calculate and plot the grand ensemble mean, ACC score, RPC score, and confidence intervals based on the random ensemble members
+    grand_ensemble_mean = np.mean(random_ensemble_members, axis=0)
+    acc_score, p_value = pearsonr_score(obs_nao_anom, grand_ensemble_mean, list(model_times_by_model.values())[0], obs_time, "1966-01-01","2010-12-31")
+    rpc = calculate_rpc(acc_score, random_ensemble_members)
+    conf_interval_lower, conf_interval_upper = calculate_confidence_intervals(random_ensemble_members)
+    ax.plot(list(model_times_by_model.values())[0], grand_ensemble_mean, color="red", label=f"DCPP-A (ACC: {acc_score:.2f})")
+    ax.fill_between(list(model_times_by_model.values())[0], conf_interval_lower, conf_interval_upper, color="red", alpha=0.2, label="5-95% confidence interval")
+
+    # Plot the observations
+    ax.plot(obs_time[3:], obs_nao_anom[3:], color="black", label="ERA5")
+
+    ax.axhline(y=0, color="black", linestyle="-", linewidth=0.5)
+    ax.set_xlim([np.datetime64("1960"), np.datetime64("2020")])
+    ax.set_ylim([-10, 10])
+    ax.set_xlabel("Year")
+    ax.set_ylabel("NAO anomalies (hPa)")
+    ax.set_title(f"NAO ensemble mean and individual members (ACC: {acc_score:.2f}, RPC: {rpc:.2f})")
+    ax.legend(loc="lower right")
+
+    # Save the plot
+    #plots_dir = "plots"  # replace this with your actual plots directory
+    fig.savefig(os.path.join(plots_dir, f"nao_ensemble_mean_and_individual_members_{no_ensemble_members}.png"), dpi=300)
+
+    plt.show()
+
+
+# Define a function that will just plot the noise for demonstration purposes
+def plot_ensemble_members_and_obs(models, model_times_by_model, model_nao_anoms_by_model, obs_nao_anom, obs_time, no_ensemble_members=10, plot_obs=True):
+    """
+    Plot the ensemble mean of all members from all models and a random selection of the ensemble members.
+
+    Parameters
+    ----------
+    models : dict
+        A dictionary containing a list of models.
+    model_times_by_model : dict
+        A dictionary containing model times for each model.
+    model_nao_anoms_by_model : dict
+        A dictionary containing model NAO anomalies for each model.
+    obs_nao_anom : numpy.ndarray
+        The observed NAO anomalies time series.
+    obs_time : numpy.ndarray
+        The observed time array.
+    no_ensemble_members : int, optional
+        The number of ensemble members to randomly select and plot. The default is 10.
+    plot_obs : bool, optional
+        Whether to plot the observations. The default is True.
+
+    Returns
+    -------
+    None
+    """
+
+    # Create a figure
+    fig, ax = plt.subplots(figsize=(10, 6))
+
+    # Initialize an empty list to store all ensemble members
+    all_ensemble_members = []
+
+    # Plot the ensemble members and calculate the ensemble mean for each model
+    ensemble_means = []
+
+    # Initialize a dictionary to store the count of ensemble members for each model
+    ensemble_member_counts = {}
+
+    # Iterate over the models
+    for model_name in models:
+        model_time = model_times_by_model[model_name]
+        model_nao_anom = model_nao_anoms_by_model[model_name]
+
+        # If the model_name is not in the dictionary, initialize its count to 0
+        if model_name not in ensemble_member_counts:
+            ensemble_member_counts[model_name] = 0
+
+        # Add each member to the list of all ensemble members
+        for member in model_nao_anom:
+            all_ensemble_members.append(member)
+
+            # Increment the count of ensemble members for the current model
+            ensemble_member_counts[model_name] += 1
+
+        # Calculate and store ensemble mean
+        ensemble_means.append(ensemble_mean(model_nao_anom))
+
+    # Convert the ensemble_member_counts dictionary to a list of tuples
+    ensemble_member_counts_list = [(model, count) for model, count in ensemble_member_counts.items()]
+
+    # Convert the list of all ensemble members to a NumPy array
+    all_ensemble_members_array = np.array(all_ensemble_members)
+
+    # Randomly select "no_ensemble_members" ensemble members to plot
+    random_ensemble_members_indices = np.random.choice(len(all_ensemble_members_array), no_ensemble_members, replace=False)
+    random_ensemble_members = all_ensemble_members_array[random_ensemble_members_indices]
+
+    # Plot the randomly selected ensemble members
+    for member in random_ensemble_members:
+        ax.plot(model_time, member, color="red", alpha=0.4, linewidth=0.8)
+
+    # print the number of ensemble members
+    # in the top right corner
+    ax.text(0.98, 0.98, f"Number of ensemble members: {no_ensemble_members}", transform=ax.transAxes, ha="right", va="top")
+
+    # optionally plot the observations
+    if plot_obs:
+        # Plot ERA5 data
+        ax.plot(obs_time[3:], obs_nao_anom[3:], color="black", label="ERA5")
+    else:
+        pass
+
+    ax.axhline(y=0, color="black", linestyle="-", linewidth=0.5)
+    ax.set_xlim([np.datetime64("1960"), np.datetime64("2020")])
+    ax.set_ylim([-10, 10])
+    ax.set_xlabel("Year")
+    ax.set_ylabel("NAO anomalies (hPa)")
+
+    # Set the title with the ACC and RPC scores
+    #ax.set_title(f"NAO ensemble mean and individual members (ACC: {acc_score:.2f}, RPC: {rpc:.2f})")
+
+    # Add a legend in the bottom right corner
+    ax.legend(loc="lower right")
+
+    # Save the figure
+    # In the plots_dir directory
+    # if plot_obs: is true, then include with_obs in the filename
+    # if plot_obs: is false, then include without_obs in the filename
+    # make sure to include the no_ensemble_members in the filename
+    if plot_obs:
+        fig.savefig(os.path.join(plots_dir, f"nao_ensemble_members_with_obs_{no_ensemble_members}.png"), dpi=300)
+    else:
+        fig.savefig(os.path.join(plots_dir, f"nao_ensemble_members_without_obs_{no_ensemble_members}.png"), dpi=300)
+
+    # Show the figure
+    plt.show()
+
 
 # Define a function for plotting the model subplots for the raw data
 def plot_ensemble_members_and_lagged_adjusted_mean(models, model_times_by_model, model_nao_anoms_by_model, obs_nao_anom, obs_time, lag=4):
@@ -655,7 +838,7 @@ def plot_ensemble_members_and_lagged_adjusted_mean(models, model_times_by_model,
     ax.fill_between(model_time_lagged, conf_interval_lower, conf_interval_upper, color="red", alpha=0.2, label="5-95% confidence interval")
 
     # Plot ERA5 data
-    ax.plot(obs_time[3:], obs_nao_anom[3:], color="black", label="ERA5")
+    ax.plot(obs_time[2:], obs_nao_anom[2:], color="black", label="ERA5")
 
     ax.axhline(y=0, color="black", linestyle="-", linewidth=0.5)
     ax.set_xlim([np.datetime64("1960"), np.datetime64("2020")])
@@ -742,7 +925,7 @@ def plot_subplots_ensemble_members_and_mean(models, model_times_by_model, model_
         ax.fill_between(model_time, conf_interval_lower, conf_interval_upper, color="red", alpha=0.2)
 
         # Plot ERA5 data
-        ax.plot(obs_time[3:], obs_nao_anom[3:], color="black", label="ERA5")
+        ax.plot(obs_time[2:], obs_nao_anom[2:], color="black", label="ERA5")
 
         ax.axhline(y=0, color="black", linestyle="-", linewidth=0.5)
         ax.set_xlim([np.datetime64("1960"), np.datetime64("2020")])
@@ -842,7 +1025,7 @@ def plot_subplots_ensemble_members_and_lagged_adjusted_mean(models, model_times_
         ax.fill_between(model_time_lagged, conf_interval_lower, conf_interval_upper, color="red", alpha=0.2)
 
         # Plot ERA5 data
-        ax.plot(obs_time[3:], obs_nao_anom[3:], color="black", label="ERA5")
+        ax.plot(obs_time[2:], obs_nao_anom[2:], color="black", label="ERA5")
 
         ax.axhline(y=0, color="black", linestyle="-", linewidth=0.5)
         ax.set_xlim([np.datetime64("1960"), np.datetime64("2020")])
