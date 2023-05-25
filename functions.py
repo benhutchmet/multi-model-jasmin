@@ -586,10 +586,25 @@ def plot_ensemble_members_and_mean(models, model_times_by_model, model_nao_anoms
     ax.set_xlabel("Year")
     ax.set_ylabel("NAO anomalies (hPa)")
 
+    # check if the p-value is les than 0.01
+    # Check if the p_values are less than 0.01 and set the text accordingly
+    if p_value_short < 0.01 and p_value_long < 0.01:
+        p_value_text_short = '< 0.01'
+        p_value_text_long = '< 0.01'
+    elif p_value_short < 0.01:
+        p_value_text_short = '< 0.01'
+        p_value_text_long = f'= {p_value_long:.2f}'
+    elif p_value_long < 0.01:
+        p_value_text_short = f'= {p_value_short:.2f}'
+        p_value_text_long = '< 0.01'
+    else:
+        p_value_text_short = f'= {p_value_short:.2f}'
+        p_value_text_long = f'= {p_value_long:.2f}'
+    
     # Set the title with the ACC and RPC scores
     # the title will be formatted like this:
-    # "ACC = +{acc_score_short:.2f} (+{acc_score_long:.2f}), P = {p_value_short:.2f} ({p_value_long:.2f}), RPC = {rpc_short:.2f} ({rpc_long:.2f}), N = {no_ensemble_members}"
-    ax.set_title(f"ACC = +{acc_score_short:.2f} (+{acc_score_long:.2f}), P = +{p_value_short:.2f} (={p_value_long:.2f}), RPC = {rpc_short:.2f} ({rpc_long:.2f}), N = {no_ensemble_members}")
+    # "ACC = +{acc_score_short:.2f} (+{acc_score_long:.2f}), P = {p_value_short} ({p_value_long}), RPC = {rpc_short:.2f} ({rpc_long:.2f}), N = {no_ensemble_members}"
+    ax.set_title(f"ACC = +{acc_score_short:.2f} (+{acc_score_long:.2f}), P {p_value_text_short} ({p_value_text_long}), RPC = +{rpc_short:.2f} (+{rpc_long:.2f}), N = {no_ensemble_members}")
 
     # Add a legend in the bottom right corner
     ax.legend(loc="lower right")
