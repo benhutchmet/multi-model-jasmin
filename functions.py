@@ -1179,6 +1179,9 @@ def plot_subplots_ensemble_members_and_lagged_adjusted_mean(models, model_times_
         # Calculate the ensemble mean
         ensemble_mean = np.mean(all_ensemble_members_array, axis=0)
 
+        # count the number of ensemble members
+        no_ensemble_members = len(all_ensemble_members[:,0])
+
         # Apply lagging and variance adjustment to the grand ensemble mean
         lagged_ensemble_mean, model_time_lagged = process_lagged_ensemble_mean(ensemble_mean, model_time, lag)
         lagged_adjusted_ensemble_mean = adjust_variance(lagged_ensemble_mean)
@@ -1251,7 +1254,7 @@ def plot_subplots_ensemble_members_and_lagged_adjusted_mean(models, model_times_
     # Show the figure
     plt.show()
 
-def calculate_acc_by_ensemble_size(models, model_nao_anoms_by_model, obs_nao_anom, step_size=2, num_samples=400):
+def calculate_acc_by_ensemble_size(models, model_nao_anoms_by_model, obs_nao_anom,obs_time, step_size=2, num_samples=400):
     """
     Calculate ACC scores as the ensemble size increases and plot them.
 
@@ -1263,6 +1266,8 @@ def calculate_acc_by_ensemble_size(models, model_nao_anoms_by_model, obs_nao_ano
         A dictionary containing model NAO anomalies for each model.
     obs_nao_anom : numpy.ndarray
         The observed NAO anomalies time series.
+    obs_time : numpy.ndarray
+        The observed time array.
     step_size : int, optional
         The step size for increasing the ensemble size (default is 1).
     num_samples : int, optional
@@ -1291,14 +1296,18 @@ def calculate_acc_by_ensemble_size(models, model_nao_anoms_by_model, obs_nao_ano
 
     # Initialize lists to store the ensemble sizes and their corresponding ACC scores
     ensemble_sizes = []
-    acc_scores = []
-    conf_ints_lower = []
-    conf_ints_upper = []
+    acc_scores_short = []
+    acc_scores_long = []
+    conf_ints_lower_short = []
+    conf_ints_upper_short = []
+    conf_ints_lower_long = []
+    conf_ints_upper_long = []
 
     # Iterate over the ensemble sizes from 1 to the total number of ensemble members
     for ensemble_size in range(1, total_ensemble_members + 1, step_size):
         # Initialize a list to store the ACC scores for the current ensemble size
-        current_acc_scores = []
+        current_short_acc_scores = []
+        current_long_acc_scores = []
 
         # Draw num_samples random samples of size ensemble_size and calculate ACC for each sample
         for _ in range(num_samples):
@@ -1308,30 +1317,51 @@ def calculate_acc_by_ensemble_size(models, model_nao_anoms_by_model, obs_nao_ano
             # Calculate the ensemble mean
             ensemble_mean = np.mean(sample, axis=0)
 
-            # Calculate the ACC score and append it to the list
-            acc_score, _ = pearsonr(obs_nao_anom[3:-5], ensemble_mean[:-9])
-            current_acc_scores.append(acc_score)
+            # Calculate the short period ACC score
+            # and append to the list
+            acc_score_short, _ = pearsonr_score(obs_nao_anom, ensemble_mean, list(models.values())[0], obs_time, "1966-01-01","2010-12-31")
+            current_short_acc_scores.append(acc_score_short)
+
+            # Calculate the long period ACC score
+            # and append to the list
+            acc_score_long, _ = pearsonr_score(obs_nao_anom, ensemble_mean, list(models.values())[0], obs_time, "1966-01-01","2019-12-31")
+            current_long_acc_scores.append(acc_score_long)
 
         # Calculate the mean ACC score for the current ensemble size
-        mean_acc_score = np.mean(current_acc_scores)
+        # for the short period
+        mean_acc_score_short = np.mean(current_short_acc_scores)
+        # for the long period
+        mean_acc_score_long = np.mean(current_long_acc_scores)
 
         # Calculate the 5-95% confidence interval for the current ACC scores
-        conf_interval = mstats.mquantiles(current_acc_scores, prob=[0.05, 0.95])
+        # for the short period
+        conf_interval_short = np.percentile(current_short_acc_scores, [5, 95])
+        # for the long period
+        conf_interval_long = np.percentile(current_long_acc_scores, [5, 95])
 
         # Append the ensemble size, its corresponding mean ACC score, and confidence interval to the lists
         ensemble_sizes.append(ensemble_size)
-        acc_scores.append(mean_acc_score)
-        conf_ints_lower.append(conf_interval[0])
-        conf_ints_upper.append(conf_interval[1])
+        acc_scores_short.append(mean_acc_score_short)
+        acc_scores_long.append(mean_acc_score_long)
+        conf_ints_lower_short.append(conf_interval_short[0])
+        conf_ints_upper_short.append(conf_interval_short[1])
+        conf_ints_lower_long.append(conf_interval_long[0])
+        conf_ints_upper_long.append(conf_interval_long[1])
 
     # Create a figure
     fig, ax = plt.subplots(figsize=(10, 6))
 
     # Plot the ACC scores against the ensemble sizes
-    ax.plot(ensemble_sizes, acc_scores, marker='o', linestyle='-')
+    # for the short period
+    ax.plot(ensemble_sizes, acc_scores_short, color="red", label="Short period")
+    # for the long period
+    ax.plot(ensemble_sizes, acc_scores_long, color="blue", label="Long period")
 
     # Plot the 5-95% confidence intervals
-    ax.fill_between(ensemble_sizes, conf_ints_lower, conf_ints_upper, color='gray', alpha=0.5)
+    # for the short period
+    ax.fill_between(ensemble_sizes, conf_ints_lower_short, conf_ints_upper_short, color="red", alpha=0.2)
+    # for the long period
+    ax.fill_between(ensemble_sizes, conf_ints_lower_long, conf_ints_upper_long, color="blue", alpha=0.2)
 
     # Save the figure
     # In the plots_dir directory
