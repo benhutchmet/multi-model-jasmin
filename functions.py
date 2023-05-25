@@ -1092,8 +1092,12 @@ def plot_subplots_ensemble_members_and_mean(models, model_times_by_model, model_
         ax.axhline(y=0, color="black", linestyle="-", linewidth=0.5)
         ax.set_xlim([np.datetime64("1960"), np.datetime64("2020")])
         ax.set_ylim([-10, 10])
-        ax.set_xlabel("Year")
+        #ax.set_xlabel("Year")
         ax.set_ylabel("NAO (hPa)")
+
+        # set the x-axis label for the bottom two subplots
+        if i in [10, 11]:
+            ax.set_xlabel("year")
 
         # check if the p-value is les than 0.01
         # Check if the p_values are less than 0.01 and set the text accordingly
@@ -1113,12 +1117,15 @@ def plot_subplots_ensemble_members_and_mean(models, model_times_by_model, model_
         # Set the title with the ACC and RPC scores
         # the title will be formatted like this:
         # "ACC = +{acc_score_short:.2f} (+{acc_score_long:.2f}), P = {p_value_short} ({p_value_long}), RPC = {rpc_short:.2f} ({rpc_long:.2f}), N = {no_ensemble_members}"
-        ax.set_title(f"ACC = +{acc_score_short:.2f} (+{acc_score_long:.2f}), P {p_value_text_short} ({p_value_text_long}), RPC = +{rpc_short:.2f} (+{rpc_long:.2f})")
+        ax.set_title(f"ACC = +{acc_score_short:.2f} (+{acc_score_long:.2f}), P {p_value_text_short} ({p_value_text_long}), RPC = +{rpc_short:.2f} (+{rpc_long:.2f})", fontsize = 10)
+
+        # x axis label
+        #ax.set_xlabel("Year")
         
         # format the model name in the top left of the figure
         # with the number of ensemble members (N = ??) beneath it
         ax.text(0.02, 0.98, f"{model_name}", transform=ax.transAxes, ha="left", va="top")
-        ax.text(0.02, 0.92, f"N = {no_ensemble_members}", transform=ax.transAxes, ha="left", va="top")
+        ax.text(0.02, 0.85, f"N = {no_ensemble_members}", transform=ax.transAxes, ha="left", va="top")
 
         # Add the legend in the bottom right corner
         ax.legend(loc="lower right")
@@ -1214,7 +1221,7 @@ def plot_subplots_ensemble_members_and_lagged_adjusted_mean(models, model_times_
         conf_interval_lower, conf_interval_upper = compute_rmse_confidence_intervals(obs_nao_anom, lagged_adjusted_ensemble_mean, obs_time, model_time_lagged)
 
         # Plot the lagged and adjusted ensemble mean with the ACC score in the legend
-        ax.plot(model_time_lagged, lagged_adjusted_ensemble_mean[:-4], color="red", label="DCPP-A lagged + var. adjust")
+        ax.plot(model_time_lagged, lagged_adjusted_ensemble_mean[:-4], color="red", label="DCPP-A")
 
         # Plot the 5-95% confidence intervals
         # Plot the 5-95% confidence intervals for the short period
@@ -1228,9 +1235,12 @@ def plot_subplots_ensemble_members_and_lagged_adjusted_mean(models, model_times_
         ax.axhline(y=0, color="black", linestyle="-", linewidth=0.5)
         ax.set_xlim([np.datetime64("1960"), np.datetime64("2020")])
         ax.set_ylim([-10, 10])
-        ax.set_xlabel("Year")
         ax.set_ylabel("NAO (hPa)")
 
+        # set the x-axis label for the bottom two subplots
+        if i in [10, 11]:
+            ax.set_xlabel("year")
+            
         # check if the p-value is les than 0.01
         # Check if the p_values are less than 0.01 and set the text accordingly
         if p_value_short < 0.01 and p_value_long < 0.01:
@@ -1249,12 +1259,15 @@ def plot_subplots_ensemble_members_and_lagged_adjusted_mean(models, model_times_
         # Set the title with the ACC and RPC scores
         # the title will be formatted like this:
         # "ACC = +{acc_score_short:.2f} (+{acc_score_long:.2f}), P = {p_value_short} ({p_value_long}), RPC = {rpc_short:.2f} ({rpc_long:.2f}), N = {no_ensemble_members}"
-        ax.set_title(f"ACC = +{acc_score_short:.2f} (+{acc_score_long:.2f}), P {p_value_text_short} ({p_value_text_long}), RPC = +{rpc_short:.2f} (+{rpc_long:.2f})")
+        ax.set_title(f"ACC = +{acc_score_short:.2f} (+{acc_score_long:.2f}), P {p_value_text_short} ({p_value_text_long}), RPC = +{rpc_short:.2f} (+{rpc_long:.2f})", fontsize = 10)
+
+        # set the x-axis label
+        #ax.set_xlabel("Year")
         
         # format the model name in the top left of the figure
         # with the number of ensemble members (N = ??) beneath it
         ax.text(0.02, 0.98, f"{model_name}", transform=ax.transAxes, ha="left", va="top")
-        ax.text(0.02, 0.92, f"N = {no_ensemble_members}", transform=ax.transAxes, ha="left", va="top")
+        ax.text(0.02, 0.85, f"N = {no_ensemble_members}", transform=ax.transAxes, ha="left", va="top")
 
         # Add the legend in the bottom right corner
         ax.legend(loc="lower right")
