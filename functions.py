@@ -573,10 +573,9 @@ def plot_ensemble_members_and_mean(models, model_times_by_model, model_nao_anoms
     # Plot the 5-95% confidence intervals
     # different shading for the two different time periods
     # short period 1966 - 2010
-    ax.fill_between(list(model_times_by_model.values())[0][:-9], conf_interval_lower[:-9], conf_interval_upper[:-9], color="red", alpha=0.2)
+    ax.fill_between(list(model_times_by_model.values())[0][:-9], conf_interval_lower[:-9], conf_interval_upper[:-9], color="red", alpha=0.3)
     # for period 2010 - 2019
-    ax.fill_between(list(model_times_by_model.values())[0][-9:], conf_interval_lower[-9:], conf_interval_upper[-9:], color="red", alpha=0.2)
-
+    ax.fill_between(list(model_times_by_model.values())[0][-10:], conf_interval_lower[-10:], conf_interval_upper[-10:], color="red", alpha=0.2)
 
     # Plot ERA5 data
     ax.plot(obs_time[2:], obs_nao_anom[2:], color="black", label="ERA5")
@@ -590,7 +589,7 @@ def plot_ensemble_members_and_mean(models, model_times_by_model, model_nao_anoms
     # Set the title with the ACC and RPC scores
     # the title will be formatted like this:
     # "ACC = +{acc_score_short:.2f} (+{acc_score_long:.2f}), P = {p_value_short:.2f} ({p_value_long:.2f}), RPC = {rpc_short:.2f} ({rpc_long:.2f}), N = {no_ensemble_members}"
-    ax.set_title(f"ACC = +{acc_score_short:.2f} (+{acc_score_long:.2f}), RPC = {rpc_short:.2f} ({rpc_long:.2f}), N = {no_ensemble_members})")
+    ax.set_title(f"ACC = +{acc_score_short:.2f} (+{acc_score_long:.2f}), P = +{p_value_short:.2f} (={p_value_long:.2f}), RPC = {rpc_short:.2f} ({rpc_long:.2f}), N = {no_ensemble_members}")
 
     # Add a legend in the bottom right corner
     ax.legend(loc="lower right")
