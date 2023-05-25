@@ -225,18 +225,47 @@ def calculate_rpc(correlation_coefficient, forecast_members):
 
     return rpc
 
-# Usage for debugging
-# # Assuming you have already calculated the correlation coefficient (ACC)
-# acc_score = ... # Replace this with the actual value
+def calculate_rpc_time(correlation_coefficient, forecast_members, model_times, start_date, end_date):
+    """
+    Calculate the Ratio of Predictable Components (RPC) given the correlation
+    coefficient (ACC) and individual forecast members for a specific time period.
 
-# # Assuming the individual forecast members are stored in a list of lists or a 2D numpy array
-# forecast_members = ... # Replace this with the actual data
+    Parameters:
+    correlation_coefficient (float): Correlation coefficient (ACC)
+    forecast_members (array-like): Individual forecast members
+    model_times (array-like): Datetime array corresponding to the model time series
+    start_date (str): Start date (inclusive) in the format 'YYYY-MM-DD'
+    end_date (str): End date (inclusive) in the format 'YYYY-MM-DD'
 
-# # Calculate the RPC
-# rpc = calculate_rpc(acc_score, forecast_members)
+    Returns:
+    float: Ratio of Predictable Components (RPC)
+    """
 
-# # Print the RPC value
-# print(rpc)
+    # Convert the input arrays to numpy arrays
+    forecast_members = np.array(forecast_members)
+
+    # Convert the start_date and end_date to pandas Timestamp objects
+    start_date = pd.Timestamp(start_date)
+    end_date = pd.Timestamp(end_date)
+
+    # Find the start and end indices of the time period for the model
+    model_start_index = np.where(model_times >= start_date)[0][0]
+    model_end_index = np.where(model_times <= end_date)[0][-1]
+
+    # Filter the forecast members based on the start and end indices
+    forecast_members = forecast_members[:, model_start_index:model_end_index+1]
+
+    # Calculate the standard deviation of the predictable signal for forecasts (σfsig)
+    sigma_fsig = np.std(np.mean(forecast_members, axis=0))
+
+    # Calculate the total standard deviation for forecasts (σftot)
+    sigma_ftot = np.std(forecast_members)
+
+    # Calculate the RPC
+    rpc = correlation_coefficient / (sigma_fsig / sigma_ftot)
+
+    return rpc
+
 
 # Two ways of calculating the uncertainty
 # First calculates the ensemble standard deviation
@@ -508,14 +537,30 @@ def plot_ensemble_members_and_mean(models, model_times_by_model, model_nao_anoms
     # Convert the list of all ensemble members to a NumPy array
     all_ensemble_members_array = np.array(all_ensemble_members)
 
+    # save the number of ensemble members
+    no_ensemble_members = len(all_ensemble_members_array[:,0])
+
     # Calculate the grand ensemble mean using the new method
     grand_ensemble_mean = np.mean(all_ensemble_members_array, axis=0)
 
-    # Calculate the ACC score using the function pearsonr_score
-    acc_score, p_value = pearsonr_score(obs_nao_anom, grand_ensemble_mean, list(model_times_by_model.values())[0], obs_time, "1966-01-01","2010-12-31")
+    # Calculate the ACC score for the //
+    # short period using the function pearsonr_score
+    acc_score_short, p_value_short = pearsonr_score(obs_nao_anom, grand_ensemble_mean, list(model_times_by_model.values())[0], obs_time, "1966-01-01","2010-12-31")
 
-    # Calculate the RPC score using the function calculate_rpc
-    rpc = calculate_rpc(acc_score, all_ensemble_members_array)
+    # Calculate the ACC score for the //
+    # long period using the function pearsonr_score
+    # long period 1966 - 2019
+    acc_score_long, p_value_long = pearsonr_score(obs_nao_anom, grand_ensemble_mean, list(model_times_by_model.values())[0], obs_time, "1966-01-01","2019-12-31")
+
+    # Calculate the RPC score for the short period
+    # using the function calculate_rpc_time
+    # short period 1966 - 2010
+    rpc_short = calculate_rpc_time(acc_score_short, all_ensemble_members_array, list(model_times_by_model.values())[0], "1966-01-01","2010-12-31")
+
+    # Calculate the RPC score for the long period
+    # using the function calculate_rpc_time
+    # long period 1966 - 2019
+    rpc_long = calculate_rpc_time(acc_score_long, all_ensemble_members_array, list(model_times_by_model.values())[0], "1966-01-01","2019-12-31")
 
     # Calculate the 5-95% confidence intervals using the two functions options
     # First calculate_confidence_intervals_sd
@@ -523,11 +568,14 @@ def plot_ensemble_members_and_mean(models, model_times_by_model, model_nao_anoms
     conf_interval_lower, conf_interval_upper = calculate_confidence_intervals(all_ensemble_members_array)
 
     # Plot the grand ensemble mean with the ACC score in the legend
-    ax.plot(list(model_times_by_model.values())[0], grand_ensemble_mean, color="red", label=f"DCPP-A (ACC: {acc_score:.2f})")
-
+    ax.plot(list(model_times_by_model.values())[0], grand_ensemble_mean, color="red", label=f"DCPP-A")
 
     # Plot the 5-95% confidence intervals
-    ax.fill_between(list(model_times_by_model.values())[0], conf_interval_lower, conf_interval_upper, color="red", alpha=0.2, label="5-95% confidence interval")
+    # different shading for the two different time periods
+    # short period 1966 - 2010
+    ax.fill_between(list(model_times_by_model.values())[0][:-9], conf_interval_lower[:-9], conf_interval_upper[:-9], color="red", alpha=0.3)
+    # for period 2010 - 2019
+    ax.fill_between(list(model_times_by_model.values())[0][-10:], conf_interval_lower[-10:], conf_interval_upper[-10:], color="red", alpha=0.2)
 
     # Plot ERA5 data
     ax.plot(obs_time[2:], obs_nao_anom[2:], color="black", label="ERA5")
@@ -538,8 +586,25 @@ def plot_ensemble_members_and_mean(models, model_times_by_model, model_nao_anoms
     ax.set_xlabel("Year")
     ax.set_ylabel("NAO anomalies (hPa)")
 
+    # check if the p-value is les than 0.01
+    # Check if the p_values are less than 0.01 and set the text accordingly
+    if p_value_short < 0.01 and p_value_long < 0.01:
+        p_value_text_short = '< 0.01'
+        p_value_text_long = '< 0.01'
+    elif p_value_short < 0.01:
+        p_value_text_short = '< 0.01'
+        p_value_text_long = f'= {p_value_long:.2f}'
+    elif p_value_long < 0.01:
+        p_value_text_short = f'= {p_value_short:.2f}'
+        p_value_text_long = '< 0.01'
+    else:
+        p_value_text_short = f'= {p_value_short:.2f}'
+        p_value_text_long = f'= {p_value_long:.2f}'
+    
     # Set the title with the ACC and RPC scores
-    ax.set_title(f"NAO ensemble mean and individual members (ACC: {acc_score:.2f}, RPC: {rpc:.2f})")
+    # the title will be formatted like this:
+    # "ACC = +{acc_score_short:.2f} (+{acc_score_long:.2f}), P = {p_value_short} ({p_value_long}), RPC = {rpc_short:.2f} ({rpc_long:.2f}), N = {no_ensemble_members}"
+    ax.set_title(f"ACC = +{acc_score_short:.2f} (+{acc_score_long:.2f}), P {p_value_text_short} ({p_value_text_long}), RPC = +{rpc_short:.2f} (+{rpc_long:.2f}), N = {no_ensemble_members}")
 
     # Add a legend in the bottom right corner
     ax.legend(loc="lower right")
