@@ -573,7 +573,9 @@ def plot_ensemble_members_and_mean(models, model_times_by_model, model_nao_anoms
     # Plot the 5-95% confidence intervals
     # different shading for the two different time periods
     # short period 1966 - 2010
-    ax.fill_between(list(model_times_by_model.values())[0], conf_interval_lower, conf_interval_upper, color="red", alpha=0.2, label="5-95% confidence interval")
+    ax.fill_between(list(model_times_by_model.values())[0][:-9], conf_interval_lower[:-9], conf_interval_upper[:-9], color="red", alpha=0.2)
+    # for period 2010 - 2019
+    ax.fill_between(list(model_times_by_model.values())[0][-9:], conf_interval_lower[-9:], conf_interval_upper[-9:], color="red", alpha=0.2)
 
 
     # Plot ERA5 data
