@@ -1113,7 +1113,12 @@ def plot_subplots_ensemble_members_and_mean(models, model_times_by_model, model_
         # Set the title with the ACC and RPC scores
         # the title will be formatted like this:
         # "ACC = +{acc_score_short:.2f} (+{acc_score_long:.2f}), P = {p_value_short} ({p_value_long}), RPC = {rpc_short:.2f} ({rpc_long:.2f}), N = {no_ensemble_members}"
-        ax.set_title(f"{model_name}, ACC = +{acc_score_short:.2f} (+{acc_score_long:.2f}), P {p_value_text_short} ({p_value_text_long}), RPC = +{rpc_short:.2f} (+{rpc_long:.2f}), N = {no_ensemble_members}")
+        ax.set_title(f"ACC = +{acc_score_short:.2f} (+{acc_score_long:.2f}), P {p_value_text_short} ({p_value_text_long}), RPC = +{rpc_short:.2f} (+{rpc_long:.2f})")
+        
+        # format the model name in the top left of the figure
+        # with the number of ensemble members (N = ??) beneath it
+        ax.text(0.02, 0.98, f"{model_name}", transform=ax.transAxes, ha="left", va="top")
+        ax.text(0.02, 0.92, f"N = {no_ensemble_members}", transform=ax.transAxes, ha="left", va="top")
 
         # Add the legend in the bottom right corner
         ax.legend(loc="lower right")
@@ -1244,7 +1249,12 @@ def plot_subplots_ensemble_members_and_lagged_adjusted_mean(models, model_times_
         # Set the title with the ACC and RPC scores
         # the title will be formatted like this:
         # "ACC = +{acc_score_short:.2f} (+{acc_score_long:.2f}), P = {p_value_short} ({p_value_long}), RPC = {rpc_short:.2f} ({rpc_long:.2f}), N = {no_ensemble_members}"
-        ax.set_title(f"{model_name}, ACC = +{acc_score_short:.2f} (+{acc_score_long:.2f}), P {p_value_text_short} ({p_value_text_long}), RPC = +{rpc_short:.2f} (+{rpc_long:.2f}), N = {no_ensemble_members}")
+        ax.set_title(f"ACC = +{acc_score_short:.2f} (+{acc_score_long:.2f}), P {p_value_text_short} ({p_value_text_long}), RPC = +{rpc_short:.2f} (+{rpc_long:.2f})")
+        
+        # format the model name in the top left of the figure
+        # with the number of ensemble members (N = ??) beneath it
+        ax.text(0.02, 0.98, f"{model_name}", transform=ax.transAxes, ha="left", va="top")
+        ax.text(0.02, 0.92, f"N = {no_ensemble_members}", transform=ax.transAxes, ha="left", va="top")
 
         # Add the legend in the bottom right corner
         ax.legend(loc="lower right")
