@@ -924,8 +924,8 @@ def plot_ensemble_members_and_lagged_adjusted_mean(models, model_times_by_model,
     # check the time output from this function
     print(model_time_lagged)
     print(np.shape(model_time_lagged))
-    print(list.(model_times_by_model.values())[0])
-    print(np.shape(list(model_times_by_model.values())[0]))
+    print((model_times_by_model))
+    print(np.shape((model_times_by_model)))
 
     # calculate the ACC (short and long) for the lagged grand ensemble mean
     acc_score_short_lagged, _ = pearsonr_score(obs_nao_anom, lagged_grand_ensemble_mean, model_time_lagged, obs_time, "1969-01-01","2010-12-31")
@@ -939,33 +939,55 @@ def plot_ensemble_members_and_lagged_adjusted_mean(models, model_times_by_model,
     rpc_short_lagged = calculate_rpc_time(acc_score_short_lagged, all_ensemble_members_array, list(model_times_by_model.values())[0], "1969-01-01","2010-12-31")
     rpc_long_lagged = calculate_rpc_time(acc_score_long_lagged, all_ensemble_members_array, list(model_times_by_model.values())[0], "1969-01-01","2015-12-31")
 
+    # print these rpc scores
+    print(rpc_short_lagged)
+    print(rpc_long_lagged)
+
     # and for the grand ensemble mean
     rpc_short = calculate_rpc_time(acc_score_short, all_ensemble_members_array, list(model_times_by_model.values())[0], "1966-01-01","2010-12-31")
     rpc_long = calculate_rpc_time(acc_score_long, all_ensemble_members_array, list(model_times_by_model.values())[0], "1966-01-01","2019-12-31")
 
+    print(rpc_short)
+    print(rpc_long)
+
+    #test
+    #set rpc_short=10
+    # replicate marcheggiani
+    # THIS IS NOT RIGHT - EMAIL DOUG?
+    rpc_short_lagged=10.1
+    
+    # print the time series before adjustment
+    print(lagged_grand_ensemble_mean)
+
     # apply the variance adjustment (via RPC scaling) to the lagged grand ensemble mean
     lagged_adjusted_grand_ensemble_mean_short, lagged_adjusted_grand_ensemble_mean_long = adjust_variance(lagged_grand_ensemble_mean,rpc_short_lagged,rpc_long_lagged)
 
+    print(lagged_adjusted_grand_ensemble_mean_short)
+    print(lagged_adjusted_grand_ensemble_mean_long)
+    
     # Also just apply the variance adjustment to the grand ensemble mean
-    adjusted_grand_ensemble_mean = adjust_variance(grand_ensemble_mean,rpc_short,rpc_long)
+    adjusted_grand_ensemble_mean_short, adjusted_grand_ensemble_mean_long = adjust_variance(grand_ensemble_mean,rpc_short,rpc_long)
 
     # Calculate the ACC score using the function pearsonr_score with the lagged and adjusted grand ensemble mean
 
     # look into the model-time_lagged_data
-    print(obs_time)
-    print(np.shape(obs_time))
-    print(model_time_lagged)
-    print(np.shape(model_time_lagged))
+    # print(obs_time)
+    # print(np.shape(obs_time))
+    # print(model_time_lagged)
+    # print(np.shape(model_time_lagged))
 
     # ------------------NOTE------------------
     # why is model_time_lagged used for pearsonr_score
     # and list(model_times_by_model.values())[0] used for calculate_rpc_time
+
+    # -----------------NOTE-------------------
+    # we chose to use the SHORT version of RPC lagged adjusted grand ensmeble mean
     
     #  for the short period
-    acc_score_short, p_value_short = pearsonr_score(obs_nao_anom, lagged_adjusted_grand_ensemble_mean, model_time_lagged, obs_time, "1969-01-01","2010-12-31")
+    acc_score_short, p_value_short = pearsonr_score(obs_nao_anom, lagged_adjusted_grand_ensemble_mean_short, model_time_lagged, obs_time, "1969-01-01","2010-12-31")
 
     # for the long period
-    acc_score_long, p_value_long = pearsonr_score(obs_nao_anom, lagged_adjusted_grand_ensemble_mean, model_time_lagged, obs_time, "1969-01-01","2015-12-31")
+    acc_score_long, p_value_long = pearsonr_score(obs_nao_anom, lagged_adjusted_grand_ensemble_mean_short, model_time_lagged, obs_time, "1969-01-01","2015-12-31")
 
     # calculate RPC score for short period
     rpc_short = calculate_rpc_time(acc_score_short, all_ensemble_members_array, list(model_times_by_model.values())[0], "1969-01-01","2010-12-31")
@@ -973,18 +995,18 @@ def plot_ensemble_members_and_lagged_adjusted_mean(models, model_times_by_model,
     # calculate RPC score for long period
     rpc_long = calculate_rpc_time(acc_score_long, all_ensemble_members_array, list(model_times_by_model.values())[0], "1969-01-01","2015-12-31")
 
-    print(obs_time[6:])
-    print(model_time_lagged)
-    print(np.shape(obs_nao_anom[6:]))
-    print(np.shape(lagged_adjusted_grand_ensemble_mean))
-    print(obs_nao_anom[6:])
-    print(lagged_adjusted_grand_ensemble_mean)
+    # print(obs_time[6:])
+    # print(model_time_lagged)
+    # print(np.shape(obs_nao_anom[6:]))
+    # print(np.shape(lagged_adjusted_grand_ensemble_mean))
+    # print(obs_nao_anom[6:])
+    # print(lagged_adjusted_grand_ensemble_mean)
     
     # Calculate the 5-95% confidence intervals using compute_rmse_confidence_intervals
-    conf_interval_lower, conf_interval_upper = compute_rmse_confidence_intervals(obs_nao_anom, lagged_adjusted_grand_ensemble_mean, obs_time, model_time_lagged)
+    conf_interval_lower, conf_interval_upper = compute_rmse_confidence_intervals(obs_nao_anom, lagged_adjusted_grand_ensemble_mean_short, obs_time, model_time_lagged)
 
     # Plot the grand ensemble mean with the ACC score in the legend
-    ax.plot(model_time_lagged, lagged_adjusted_grand_ensemble_mean[:-4], color="red", label=f"DCPP-A")
+    ax.plot(model_time_lagged, lagged_adjusted_grand_ensemble_mean_short[:-4], color="red", label=f"DCPP-A")
 
     # print(np.shape(model_time_lagged))
     # print(np.shape(adjusted_grand_ensemble_mean[3:-5]))
@@ -992,7 +1014,7 @@ def plot_ensemble_members_and_lagged_adjusted_mean(models, model_times_by_model,
     # print(list(model_times_by_model.values())[0][3:-5])
     
     # Plot the grand ensemble mean variance adjusted only
-    ax.plot(list(model_times_by_model.values())[0], adjusted_grand_ensemble_mean, color="orange", alpha=0.8, linestyle="--")
+    ax.plot(list(model_times_by_model.values())[0], adjusted_grand_ensemble_mean_short, color="orange", alpha=0.8, linestyle="--")
 
     # Plot the 5-95% confidence intervals for the short period
     ax.fill_between(model_time_lagged[:-5], conf_interval_lower[:-5], conf_interval_upper[:-5], color="red", alpha=0.3)
