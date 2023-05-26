@@ -704,7 +704,6 @@ def plot_random_ensemble_members_and_stats(models, model_times_by_model, model_n
     ax.set_ylim([-10, 10])
     ax.set_xlabel("Year")
     ax.set_ylabel("NAO anomalies (hPa)")
-    ax.set_title(f"NAO ensemble mean and individual members (ACC: {acc_score:.2f}, RPC: {rpc:.2f})")
     ax.legend(loc="lower right")
 
     # check if the p-value is les than 0.01
