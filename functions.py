@@ -477,9 +477,7 @@ def compute_rmse_confidence_intervals(obs_nao_anoms, adjusted_lagged_model_nao_a
 
     return conf_interval_lower, conf_interval_upper
 
-
-# define an optimization function
-# which selects the best ensemble members to use to get highest ACC scores
+# optimize function
 def optimize_ensemble_members(all_ensemble_members_array, no_ensemble_members, obs_nao_anom, obs_time, model_times):
     """
     Greedily select no_ensemble_members ensemble members that maximizes the ACC scores.
@@ -488,17 +486,18 @@ def optimize_ensemble_members(all_ensemble_members_array, no_ensemble_members, o
     for _ in range(no_ensemble_members):
         max_acc_score_short, max_acc_score_long, best_member = -np.inf, -np.inf, None
         for member in all_ensemble_members_array:
-            if member in ensemble_members:
+            if any(np.array_equal(member, ensemble) for ensemble in ensemble_members):
                 continue
-            ensemble = ensemble_members + [member]
+            ensemble = ensemble_members + [member.tolist()]
             grand_ensemble_mean = np.mean(ensemble, axis=0)
             acc_score_short, _ = pearsonr_score(obs_nao_anom, grand_ensemble_mean, model_times, obs_time, "1966-01-01","2010-12-31")
             acc_score_long, _ = pearsonr_score(obs_nao_anom, grand_ensemble_mean, model_times, obs_time, "1966-01-01","2019-12-31")
             if acc_score_short > max_acc_score_short and acc_score_long > max_acc_score_long:
-                max_acc_score_short, max_acc_score_long, best_member = acc_score_short, acc_score_long, member
+                max_acc_score_short, max_acc_score_long, best_member = acc_score_short, acc_score_long, member.tolist()
         if best_member is not None:
             ensemble_members.append(best_member)
-    return ensemble_members
+    return [np.array(member) for member in ensemble_members]
+
 
 # Now write a plotting function
 def plot_ensemble_members_and_mean(models, model_times_by_model, model_nao_anoms_by_model, obs_nao_anom, obs_time):
@@ -760,7 +759,7 @@ def plot_random_ensemble_members_and_stats(models, model_times_by_model, model_n
 # Define a modified version of the function above
 # which involves an optimization step
 # to randomly select the best ensemble members
-def plot_random_ensemble_members_and_stats(models, model_times_by_model, model_nao_anoms_by_model, obs_nao_anom, obs_time, no_ensemble_members=10):
+def plot_random_ensemble_members_and_stats_optimize(models, model_times_by_model, model_nao_anoms_by_model, obs_nao_anom, obs_time, no_ensemble_members=10):
     """
     Plot optimally selected ensemble members, the ensemble mean of these members, and observations, along with ACC and RPC scores.
 
@@ -783,7 +782,8 @@ def plot_random_ensemble_members_and_stats(models, model_times_by_model, model_n
     -------
     None
     """
-    # rest of your code
+    # set up
+    fig, ax = plt.subplots(figsize=(10, 6))
 
     all_ensemble_members = []
 
@@ -865,7 +865,7 @@ def plot_random_ensemble_members_and_stats(models, model_times_by_model, model_n
     #plots_dir = "plots"  # replace this with your actual plots directory
     # also include the no_ensemble_members in the filename
     # and the current date
-    fig.savefig(os.path.join(plots_dir, f"nao_ensemble_mean_and_individual_members_{no_ensemble_members}_{datetime.now().strftime('%Y-%m-%d')}.png"), dpi=300)
+    fig.savefig(os.path.join(plots_dir, f"nao_ensemble_mean_and_individual_members_optimize_{no_ensemble_members}_{datetime.now().strftime('%Y-%m-%d')}.png"), dpi=300)
 
     plt.show()   
 
@@ -981,6 +981,11 @@ def plot_ensemble_members_and_obs(models, model_times_by_model, model_nao_anoms_
 
 
 # Define a function for plotting the model subplots for the raw data
+# TODO -- SORT OUT THIS FUNCTION AND ITS ASSOCIATED FUNCTIONS
+    # -RPC SCORES TOO LOW
+    # -EXTEND PERIOD FOR 2010-2019
+    # IS IS SCALED TO THE RIGHT MAGNITUDE?
+    # EMAIL DOUG POTENTIALLY
 def plot_ensemble_members_and_lagged_adjusted_mean(models, model_times_by_model, model_nao_anoms_by_model, obs_nao_anom, obs_time, lag=4):
     """
     Plot the ensemble mean of all members from all models and each of the ensemble members, with lagged and adjusted variance applied to the grand ensemble mean.
@@ -1055,10 +1060,10 @@ def plot_ensemble_members_and_lagged_adjusted_mean(models, model_times_by_model,
     lagged_grand_ensemble_mean, model_time_lagged = process_lagged_ensemble_mean(grand_ensemble_mean, list(model_times_by_model.values())[0], lag)
 
     # check the time output from this function
-    print(model_time_lagged)
-    print(np.shape(model_time_lagged))
-    print((model_times_by_model))
-    print(np.shape((model_times_by_model)))
+    # print(model_time_lagged)
+    # print(np.shape(model_time_lagged))
+    # print((model_times_by_model))
+    # print(np.shape((model_times_by_model)))
 
     # calculate the ACC (short and long) for the lagged grand ensemble mean
     acc_score_short_lagged, _ = pearsonr_score(obs_nao_anom, lagged_grand_ensemble_mean, model_time_lagged, obs_time, "1969-01-01","2010-12-31")
@@ -1073,21 +1078,21 @@ def plot_ensemble_members_and_lagged_adjusted_mean(models, model_times_by_model,
     rpc_long_lagged = calculate_rpc_time(acc_score_long_lagged, all_ensemble_members_array, list(model_times_by_model.values())[0], "1969-01-01","2015-12-31")
 
     # print these rpc scores
-    print(rpc_short_lagged)
-    print(rpc_long_lagged)
+    # print(rpc_short_lagged)
+    # print(rpc_long_lagged)
 
     # and for the grand ensemble mean
     rpc_short = calculate_rpc_time(acc_score_short, all_ensemble_members_array, list(model_times_by_model.values())[0], "1966-01-01","2010-12-31")
     rpc_long = calculate_rpc_time(acc_score_long, all_ensemble_members_array, list(model_times_by_model.values())[0], "1966-01-01","2019-12-31")
 
-    print(rpc_short)
-    print(rpc_long)
+    # print(rpc_short)
+    # print(rpc_long)
 
     #test
     #set rpc_short=10
     # replicate marcheggiani
     # THIS IS NOT RIGHT - EMAIL DOUG?
-    rpc_short_lagged=10.1
+    #rpc_short_lagged=10.1
     
     # print the time series before adjustment
     print(lagged_grand_ensemble_mean)
@@ -1139,7 +1144,7 @@ def plot_ensemble_members_and_lagged_adjusted_mean(models, model_times_by_model,
     conf_interval_lower, conf_interval_upper = compute_rmse_confidence_intervals(obs_nao_anom, lagged_adjusted_grand_ensemble_mean_short, obs_time, model_time_lagged)
 
     # Plot the grand ensemble mean with the ACC score in the legend
-    ax.plot(model_time_lagged, lagged_adjusted_grand_ensemble_mean_short[:-4], color="red", label=f"DCPP-A")
+    ax.plot(model_time_lagged, lagged_adjusted_grand_ensemble_mean_short, color="red", label=f"DCPP-A")
 
     # print(np.shape(model_time_lagged))
     # print(np.shape(adjusted_grand_ensemble_mean[3:-5]))
