@@ -425,6 +425,11 @@ def process_lagged_ensemble_mean(data, lag=4, start_year=1969, end_year=2019):
     """
     # create a dummy time array to compare against
     # for years from 1969 to 2019
+<<<<<<< HEAD
+=======
+    # create a dummy time array to compare against
+    # for years from 1969 to 2019
+>>>>>>> 50bcd6b (local commit before pull)
     # as a datetime object
     time_array = np.arange(start_year, end_year + 1)
     time_array =  pd.to_datetime(time_array, format='%Y')
@@ -433,6 +438,22 @@ def process_lagged_ensemble_mean(data, lag=4, start_year=1969, end_year=2019):
     print("time_array: ", time_array)
     print("length of time_array: ", len(time_array))
 
+<<<<<<< HEAD
+=======
+    def lagged_ensemble_mean(data, lag):
+        # Initialize an empty array for the lagged ensemble mean
+        #lagged_mean = np.empty(len(data) - lag + 1)
+        lagged_mean = np.empty((len(data) - lag) + 1)
+        # check if the length of the lagged_mean array is correct
+        print("lagged_mean length", len(lagged_mean))
+
+        # Calculate the lagged ensemble mean for each year
+        for i in range((len(data) - lag) + 1):
+            lagged_mean[i] = np.mean(data[i:i + lag])
+
+        return lagged_mean
+
+>>>>>>> 50bcd6b (local commit before pull)
     # Calculate the lagged ensemble mean for the data
     lagged_data_mean = lagged_ensemble_mean(data, lag)
 
@@ -1274,10 +1295,14 @@ def plot_ensemble_members_and_lagged_adjusted_mean(models, model_times_by_model,
     conf_interval_lower, conf_interval_upper = compute_rmse_confidence_intervals(obs_nao_anom, lagged_adjusted_grand_ensemble_mean_long, obs_time, model_time_lagged)
 
     # Plot the grand ensemble mean with the ACC score in the legend
+<<<<<<< HEAD
     ax.plot(model_time_lagged, lagged_adjusted_grand_ensemble_mean_long, color="red", label=f"DCPP-A")
 
     # plot the RPS adjusted grand ensemble mean
     ax.plot(model_time_lagged, adjusted_grand_ensemble_mean_long_rps, color="red", alpha=0.8, linestyle="-.", label=f"DCPP-A RPS")
+=======
+    ax.plot(model_time_lagged, lagged_adjusted_grand_ensemble_mean_short, color="red", label=f"DCPP-A")
+>>>>>>> 50bcd6b (local commit before pull)
 
     # print(np.shape(model_time_lagged))
     # print(np.shape(adjusted_grand_ensemble_mean[3:-5]))

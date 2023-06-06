@@ -340,7 +340,7 @@ def calculate_confidence_intervals(ensemble_members_array, lower_bound=5, upper_
 
 # Function to lag the NAO data and create a new time
 # array
-def process_lagged_ensemble_mean(data, time_array, lag=4):
+def process_lagged_ensemble_mean(data, lag=4, start_year=1969, end_year=2019):
     """
     Lag the input data by a specified number of years and create a new time array
     corresponding to the lagged data. This function is useful for processing ensemble
@@ -350,10 +350,12 @@ def process_lagged_ensemble_mean(data, time_array, lag=4):
     ----------
     data : numpy.ndarray
         The input data to be lagged, typically an ensemble mean time series.
-    time_array : numpy.ndarray
-        The time array corresponding to the input data.
     lag : int, optional, default: 4
         The number of years to lag the data by.
+    start_year : int, optional, default: 1969
+        The start year of the time array.
+    end_year : int, optional, default: 2019
+        The end year of the time array.
     
     Returns
     -------
@@ -362,12 +364,27 @@ def process_lagged_ensemble_mean(data, time_array, lag=4):
     model_time_lagged : numpy.ndarray
         The new time array corresponding to the lagged data.
     """
+    # create a dummy time array to compare against
+    # for years from 1969 to 2019
+    # create a dummy time array to compare against
+    # for years from 1969 to 2019
+    # as a datetime object
+    time_array = np.arange(start_year, end_year + 1)
+    time_array =  pd.to_datetime(time_array, format='%Y')
+
+    # check the time array
+    print("time_array: ", time_array)
+    print("length of time_array: ", len(time_array))
+
     def lagged_ensemble_mean(data, lag):
         # Initialize an empty array for the lagged ensemble mean
-        lagged_mean = np.empty(len(data) - lag + 1)
+        #lagged_mean = np.empty(len(data) - lag + 1)
+        lagged_mean = np.empty((len(data) - lag) + 1)
+        # check if the length of the lagged_mean array is correct
+        print("lagged_mean length", len(lagged_mean))
 
         # Calculate the lagged ensemble mean for each year
-        for i in range(len(data) - lag + 1):
+        for i in range((len(data) - lag) + 1):
             lagged_mean[i] = np.mean(data[i:i + lag])
 
         return lagged_mean
@@ -376,7 +393,7 @@ def process_lagged_ensemble_mean(data, time_array, lag=4):
     lagged_data_mean = lagged_ensemble_mean(data, lag)
 
     # Calculate the corresponding model_time for the lagged data
-    model_time_lagged = time_array[:-lag][lag-1:]
+    model_time_lagged = time_array
 
     return lagged_data_mean, model_time_lagged
 
@@ -1062,7 +1079,7 @@ def plot_ensemble_members_and_lagged_adjusted_mean(models, model_times_by_model,
     print("model time", (list(model_times_by_model.values())[0]))
 
     # Apply lagging and variance adjustment to the grand ensemble mean
-    lagged_grand_ensemble_mean, model_time_lagged = process_lagged_ensemble_mean(grand_ensemble_mean, list(model_times_by_model.values())[0], lag)
+    lagged_grand_ensemble_mean, model_time_lagged = process_lagged_ensemble_mean(grand_ensemble_mean, lag=lag, start_year=1969, end_year=2019)
 
         # check the time output from this function
     print("shape of model_time_lagged", np.shape(model_time_lagged))
@@ -1071,10 +1088,10 @@ def plot_ensemble_members_and_lagged_adjusted_mean(models, model_times_by_model,
     print("lagged_grand_ensemble_mean", lagged_grand_ensemble_mean)
     
     # check the time output from this function
-    # print(model_time_lagged)
-    # print(np.shape(model_time_lagged))
-    # print((model_times_by_model))
-    # print(np.shape((model_times_by_model)))
+    print("shape of model_time_lagged", np.shape(model_time_lagged))
+    print("model_time_lagged", model_time_lagged)
+    print("shape of lagged_grand_ensemble_mean", np.shape(lagged_grand_ensemble_mean))
+    print("lagged_grand_ensemble_mean", lagged_grand_ensemble_mean)
 
     # calculate the ACC (short and long) for the lagged grand ensemble mean
     acc_score_short_lagged, _ = pearsonr_score(obs_nao_anom, lagged_grand_ensemble_mean, model_time_lagged, obs_time, "1969-01-01","2010-12-31")
@@ -1155,7 +1172,7 @@ def plot_ensemble_members_and_lagged_adjusted_mean(models, model_times_by_model,
     conf_interval_lower, conf_interval_upper = compute_rmse_confidence_intervals(obs_nao_anom, lagged_adjusted_grand_ensemble_mean_short, obs_time, model_time_lagged)
 
     # Plot the grand ensemble mean with the ACC score in the legend
-    ax.plot(model_time_lagged, lagged_adjusted_grand_ensemble_mean_short[:-4], color="red", label=f"DCPP-A")
+    ax.plot(model_time_lagged, lagged_adjusted_grand_ensemble_mean_short, color="red", label=f"DCPP-A")
 
     # print(np.shape(model_time_lagged))
     # print(np.shape(adjusted_grand_ensemble_mean[3:-5]))
