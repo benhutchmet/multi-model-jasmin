@@ -9,7 +9,7 @@ import xarray as xr
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from scipy.stats import pearsonr, mstats
+from scipy.stats import pearsonr, mstats, ttest_rel, ttest_ind, ttest_1samp
 from sklearn.utils import resample
 # import the datetime library
 from datetime import datetime
@@ -1752,6 +1752,10 @@ def calculate_acc_by_ensemble_size(models, model_nao_anoms_by_model, model_times
     # for the long period
     ax.plot(ensemble_sizes, acc_scores_long, color="blue", label="Long period")
 
+    # calculate whether the difference between the short and long period ACC scores is significant
+    # using a 2-sample t-test
+    t_stat, p_val = ttest_ind(acc_scores_short, acc_scores_long)
+
     # Plot the 5-95% confidence intervals
     # for the short period
     ax.fill_between(ensemble_sizes, conf_ints_lower_short, conf_ints_upper_short, color="red", alpha=0.2)
@@ -1768,6 +1772,9 @@ def calculate_acc_by_ensemble_size(models, model_nao_anoms_by_model, model_times
     ax.set_xlabel("Number of ensemble members")
     ax.set_ylabel("ACC score")
     ax.set_title("ACC score by ensemble size")
+
+    # use a title for the plot which indicates whether the difference between the short and long period ACC scores is significant
+    ax.set_title(f"ACC score by ensemble size (p={p_val:.3f})")
 
     # Add a legend in the bottom right corner
     ax.legend(loc="lower right")
