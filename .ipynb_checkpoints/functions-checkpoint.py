@@ -1056,9 +1056,20 @@ def plot_ensemble_members_and_lagged_adjusted_mean(models, model_times_by_model,
     # Calculate the grand ensemble mean using the new method
     grand_ensemble_mean = np.mean(all_ensemble_members_array, axis=0)
 
+    # print the shape of the grand ensemble mean
+    print("shape of grand ens mean", np.shape(grand_ensemble_mean))
+    # also print the model times and its shape
+    print("model time", (list(model_times_by_model.values())[0]))
+
     # Apply lagging and variance adjustment to the grand ensemble mean
     lagged_grand_ensemble_mean, model_time_lagged = process_lagged_ensemble_mean(grand_ensemble_mean, list(model_times_by_model.values())[0], lag)
 
+        # check the time output from this function
+    print("shape of model_time_lagged", np.shape(model_time_lagged))
+    print("model_time_lagged", model_time_lagged)
+    print("shape of lagged_grand_ensemble_mean", np.shape(lagged_grand_ensemble_mean))
+    print("lagged_grand_ensemble_mean", lagged_grand_ensemble_mean)
+    
     # check the time output from this function
     # print(model_time_lagged)
     # print(np.shape(model_time_lagged))
@@ -1144,7 +1155,7 @@ def plot_ensemble_members_and_lagged_adjusted_mean(models, model_times_by_model,
     conf_interval_lower, conf_interval_upper = compute_rmse_confidence_intervals(obs_nao_anom, lagged_adjusted_grand_ensemble_mean_short, obs_time, model_time_lagged)
 
     # Plot the grand ensemble mean with the ACC score in the legend
-    ax.plot(model_time_lagged, lagged_adjusted_grand_ensemble_mean_short, color="red", label=f"DCPP-A")
+    ax.plot(model_time_lagged, lagged_adjusted_grand_ensemble_mean_short[:-4], color="red", label=f"DCPP-A")
 
     # print(np.shape(model_time_lagged))
     # print(np.shape(adjusted_grand_ensemble_mean[3:-5]))
@@ -1152,7 +1163,7 @@ def plot_ensemble_members_and_lagged_adjusted_mean(models, model_times_by_model,
     # print(list(model_times_by_model.values())[0][3:-5])
     
     # Plot the grand ensemble mean variance adjusted only
-    ax.plot(list(model_times_by_model.values())[0], adjusted_grand_ensemble_mean_short, color="orange", alpha=0.8, linestyle="--")
+    ax.plot(list(model_times_by_model.values())[0], adjusted_grand_ensemble_mean_short, color="red", alpha=0.8, linestyle="--")
 
     # Plot the 5-95% confidence intervals for the short period
     ax.fill_between(model_time_lagged[:-5], conf_interval_lower[:-5], conf_interval_upper[:-5], color="red", alpha=0.3)

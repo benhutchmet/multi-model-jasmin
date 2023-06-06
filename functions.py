@@ -1167,6 +1167,12 @@ def plot_ensemble_members_and_lagged_adjusted_mean(models, model_times_by_model,
     # Apply lagging and variance adjustment to the grand ensemble mean
     lagged_grand_ensemble_mean, model_time_lagged = process_lagged_ensemble_mean(grand_ensemble_mean, lag=lag, start_year=1969, end_year=2019)
 
+        # check the time output from this function
+    print("shape of model_time_lagged", np.shape(model_time_lagged))
+    print("model_time_lagged", model_time_lagged)
+    print("shape of lagged_grand_ensemble_mean", np.shape(lagged_grand_ensemble_mean))
+    print("lagged_grand_ensemble_mean", lagged_grand_ensemble_mean)
+    
     # check the time output from this function
     print("shape of model_time_lagged", np.shape(model_time_lagged))
     print("model_time_lagged", model_time_lagged)
