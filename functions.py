@@ -516,6 +516,34 @@ def adjust_variance(model_time_series, rpc_short, rpc_long):
 
     return model_time_series_var_adjust_short, model_time_series_var_adjust_long
 
+# Function to adjust the variance of the ensemble
+def adjust_variance_members(lagged_ensemble_members, rpc_short, rpc_long):
+    """
+    Adjust the variance of an ensemble mean time series by multiplying by the RPC score. This accounts for the signal to noise issue in the ensemble mean.
+
+    Parameters
+    ----------
+    lagged_ensemble_members : numpy.ndarray
+        The input ensemble mean time series with shape (178, 54).
+    rpc_short : float
+        The RPC score for the short period.
+    rpc_long : float
+        The RPC score for the long period.
+
+    Returns
+    -------
+    model_time_series_var_adjust_short : numpy.ndarray
+        The variance adjusted ensemble mean time series for the short period RPC (1960-2010).
+    model_time_series_var_adjust_long : numpy.ndarray
+        The variance adjusted ensemble mean time series for the long period RPC (1960-2019).
+    """
+
+    # Adjust the variance of the ensemble mean time series
+    model_time_series_var_adjust_short = rpc_short * np.mean(lagged_ensemble_members, axis=1)
+    model_time_series_var_adjust_long = rpc_long * np.mean(lagged_ensemble_members, axis=1)
+
+    return model_time_series_var_adjust_short, model_time_series_var_adjust_long
+
 
 # Example usage - included for debugging
 # obs_data = np.array([1, 2, 3, 4, 5])
@@ -1255,10 +1283,15 @@ def plot_ensemble_members_and_lagged_adjusted_mean(models, model_times_by_model,
     # for the long period
     acc_score_long, p_value_long = pearsonr_score(obs_nao_anom, adjusted_grand_ensemble_mean_long_rps, model_time_lagged, obs_time, "1969-01-01","2019-12-31")
 
+    # before calculating the rpc scores we want to adjust the variance for the lagged ensemble members
+    # using the RPS scores and the function adjust_variance_members
+    lagged_adjusted_ensemble_members_short_rps, lagged_adjusted_ensemble_members_long_rps = adjust_variance_members(lagged_ensemble_members,rps_score_short_lagged, rps_score_long_lagged)
+
+
     # calculate RPC score for short period
-    rpc_short = calculate_rpc_time(acc_score_short, lagged_ensemble_members, model_time_lagged_members, "1969-01-01","2010-12-31")
+    rpc_short = calculate_rpc_time(acc_score_short, lagged_adjusted_ensemble_members_short_rps, model_time_lagged_members, "1969-01-01","2010-12-31")
     # calculate RPC score for long period
-    rpc_long = calculate_rpc_time(acc_score_long, lagged_ensemble_members, model_time_lagged_members, "1969-01-01","2019-12-31")
+    rpc_long = calculate_rpc_time(acc_score_long, lagged_adjusted_ensemble_members_long_rps, model_time_lagged_members, "1969-01-01","2019-12-31")
 
     # print(obs_time[6:])
     # print(model_time_lagged)
