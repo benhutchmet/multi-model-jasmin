@@ -516,15 +516,15 @@ def adjust_variance(model_time_series, rpc_short, rpc_long):
 
     return model_time_series_var_adjust_short, model_time_series_var_adjust_long
 
-# Function to adjust the variance of the ensemble
-def adjust_variance_members(lagged_ensemble_members, rpc_short, rpc_long):
+# Function to adjust the variance of the ensemble members
+def adjust_variance_ensemble(lagged_ensemble_members, rpc_short, rpc_long):
     """
-    Adjust the variance of an ensemble mean time series by multiplying by the RPC score. This accounts for the signal to noise issue in the ensemble mean.
+    Adjust the variance of each ensemble member's time series by multiplying by the RPC score. This accounts for the signal to noise issue in the ensemble mean.
 
     Parameters
     ----------
     lagged_ensemble_members : numpy.ndarray
-        The input ensemble mean time series with shape (178, 54).
+        The input 2D array representing the time series of each ensemble member.
     rpc_short : float
         The RPC score for the short period.
     rpc_long : float
@@ -532,17 +532,22 @@ def adjust_variance_members(lagged_ensemble_members, rpc_short, rpc_long):
 
     Returns
     -------
-    model_time_series_var_adjust_short : numpy.ndarray
-        The variance adjusted ensemble mean time series for the short period RPC (1960-2010).
-    model_time_series_var_adjust_long : numpy.ndarray
-        The variance adjusted ensemble mean time series for the long period RPC (1960-2019).
+    lagged_ensemble_var_adjust_short : numpy.ndarray
+        The variance adjusted time series for each ensemble member for the short period RPC (1960-2010).
+    lagged_ensemble_var_adjust_long : numpy.ndarray
+        The variance adjusted time series for each ensemble member for the long period RPC (1960-2019).
     """
 
-    # Adjust the variance of the ensemble mean time series
-    model_time_series_var_adjust_short = rpc_short * np.mean(lagged_ensemble_members, axis=1)
-    model_time_series_var_adjust_long = rpc_long * np.mean(lagged_ensemble_members, axis=1)
+    # Adjust the variance of the ensemble member time series
+    lagged_ensemble_var_adjust_short = np.multiply(lagged_ensemble_members, rpc_short)
+    lagged_ensemble_var_adjust_long = np.multiply(lagged_ensemble_members, rpc_long)
 
-    return model_time_series_var_adjust_short, model_time_series_var_adjust_long
+    # print the shapes of these for debugging
+    print("lagged_ensemble_var_adjust_short shape: ", lagged_ensemble_var_adjust_short.shape)
+    print("lagged_ensemble_var_adjust_long shape: ", lagged_ensemble_var_adjust_long.shape)
+
+    return lagged_ensemble_var_adjust_short, lagged_ensemble_var_adjust_long
+
 
 
 # Example usage - included for debugging
