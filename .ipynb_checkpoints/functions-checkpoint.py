@@ -268,6 +268,51 @@ def calculate_rpc_time(correlation_coefficient, forecast_members, model_times, s
 
     return rpc
 
+# Define a function to calulate the RPS score with time
+# Where RPS = RPC * (total variance of observations / total variance of all the individual forecast members)
+def calculate_rps_time(RPC, obs, forecast_members, model_times, start_date, end_date):
+    """
+    Calculate the Ratio of Predictable Signals (RPS) given the Ratio of Predictable
+    Components (RPC), observations, individual forecast members, and a time period.
+
+    Parameters:
+    RPC (float): Ratio of Predictable Components (RPC)
+    obs (array-like): Observations
+    forecast_members (array-like): Individual forecast members
+    model_times (array-like): Datetime array corresponding to the model time series
+    start_date (str): Start date (inclusive) in the format 'YYYY-MM-DD'
+    end_date (str): End date (inclusive) in the format 'YYYY-MM-DD'
+
+    Returns:
+    float: Ratio of Predictable Signals (RPS)
+    """
+
+    # Convert the input arrays to numpy arrays
+    obs = np.array(obs)
+    forecast_members = np.array(forecast_members)
+
+    # Convert the start_date and end_date to pandas Timestamp objects
+    start_date = pd.Timestamp(start_date)
+    end_date = pd.Timestamp(end_date)
+
+    # Find the start and end indices of the time period for the model
+    model_start_index = np.where(model_times >= start_date)[0][0]
+    model_end_index = np.where(model_times <= end_date)[0][-1]
+
+    # Filter the forecast members based on the start and end indices
+    forecast_members = forecast_members[:, model_start_index:model_end_index+1]
+
+    # Calculate the total variance of the observations
+    variance_obs = np.std(obs)
+
+    # Calculate the total variance of the forecast members
+    variance_forecast_members = np.std(forecast_members)
+
+    # Calculate the RPS
+    RPS = RPC * (variance_obs / variance_forecast_members)
+
+    return RPS
+
 
 # Two ways of calculating the uncertainty
 # First calculates the ensemble standard deviation
@@ -338,6 +383,20 @@ def calculate_confidence_intervals(ensemble_members_array, lower_bound=5, upper_
     conf_interval_upper = np.percentile(ensemble_members_array, upper_bound, axis=0)
     return conf_interval_lower, conf_interval_upper
 
+# define a lagging function
+def lagged_ensemble_mean(data, lag):
+    # Initialize an empty array for the lagged ensemble mean
+    lagged_mean = np.empty((len(data) - lag) + 1)
+    # check if the length of the lagged_mean array is correct
+    #print("lagged mean length", len(lagged_mean))
+
+    # Calculate the lagged ensemble mean for each year
+    for i in range((len(data) - lag) + 1):
+        lagged_mean[i] = np.mean(data[i:i + lag])
+
+    return lagged_mean
+
+
 # Function to lag the NAO data and create a new time
 # array
 def process_lagged_ensemble_mean(data, lag=4, start_year=1969, end_year=2019):
@@ -366,8 +425,6 @@ def process_lagged_ensemble_mean(data, lag=4, start_year=1969, end_year=2019):
     """
     # create a dummy time array to compare against
     # for years from 1969 to 2019
-    # create a dummy time array to compare against
-    # for years from 1969 to 2019
     # as a datetime object
     time_array = np.arange(start_year, end_year + 1)
     time_array =  pd.to_datetime(time_array, format='%Y')
@@ -375,19 +432,6 @@ def process_lagged_ensemble_mean(data, lag=4, start_year=1969, end_year=2019):
     # check the time array
     print("time_array: ", time_array)
     print("length of time_array: ", len(time_array))
-
-    def lagged_ensemble_mean(data, lag):
-        # Initialize an empty array for the lagged ensemble mean
-        #lagged_mean = np.empty(len(data) - lag + 1)
-        lagged_mean = np.empty((len(data) - lag) + 1)
-        # check if the length of the lagged_mean array is correct
-        print("lagged_mean length", len(lagged_mean))
-
-        # Calculate the lagged ensemble mean for each year
-        for i in range((len(data) - lag) + 1):
-            lagged_mean[i] = np.mean(data[i:i + lag])
-
-        return lagged_mean
 
     # Calculate the lagged ensemble mean for the data
     lagged_data_mean = lagged_ensemble_mean(data, lag)
@@ -397,8 +441,50 @@ def process_lagged_ensemble_mean(data, lag=4, start_year=1969, end_year=2019):
 
     return lagged_data_mean, model_time_lagged
 
-# Example usage
-# lagged_adjusted_var_mean, model_time_lagged = process_lagged_ensemble_mean(adjusted_var_model_nao_anom_raw, model_time_raw, lag=4)
+
+# define another function for lagging the all ensemble members array
+def process_lagged_ensemble_members(ensemble_members_array, lag=4, start_year=1969, end_year=2019):
+    """
+    Lag the input ensemble members by a specified number of years and create a new time array
+    corresponding to the lagged data. This function is useful for processing ensemble
+    mean data, such as the North Atlantic Oscillation (NAO) time series.
+    
+    Parameters
+    ----------
+    ensemble_members_array : numpy.ndarray
+        The input ensemble members to be lagged, with shape (num_ensemble_members, num_years).
+    lag : int, optional, default: 4
+        The number of years to lag the data by.
+    start_year : int, optional, default: 1969
+        The start year of the time array.
+    end_year : int, optional, default: 2019
+        The end year of the time array.
+    
+    Returns
+    -------
+    lagged_ensemble_members : numpy.ndarray
+        The lagged ensemble members data, with shape (num_ensemble_members, num_lagged_years).
+    model_time_lagged : numpy.ndarray
+        The new time array corresponding to the lagged data.
+    """
+    # Create a dummy time array to compare against for years from start_year to end_year
+    time_array = np.arange(start_year, end_year + 1)
+    time_array = pd.to_datetime(time_array, format='%Y')
+
+    # Initialize an empty array for the lagged ensemble members
+    num_ensemble_members, num_years = ensemble_members_array.shape
+    num_lagged_years = (num_years - lag) + 1
+    lagged_ensemble_members = np.empty((num_ensemble_members, num_lagged_years))
+
+    # Calculate the lagged ensemble mean for each ensemble member
+    for i in range(num_ensemble_members):
+        lagged_ensemble_members[i] = lagged_ensemble_mean(ensemble_members_array[i], lag)
+
+    # Calculate the corresponding model_time for the lagged data
+    model_time_lagged = time_array
+
+    return lagged_ensemble_members, model_time_lagged
+
 
 # Function to adjust the variance of the ensemble
 # Used once the no. of ensemble members has been 4x
@@ -1081,12 +1167,6 @@ def plot_ensemble_members_and_lagged_adjusted_mean(models, model_times_by_model,
     # Apply lagging and variance adjustment to the grand ensemble mean
     lagged_grand_ensemble_mean, model_time_lagged = process_lagged_ensemble_mean(grand_ensemble_mean, lag=lag, start_year=1969, end_year=2019)
 
-        # check the time output from this function
-    print("shape of model_time_lagged", np.shape(model_time_lagged))
-    print("model_time_lagged", model_time_lagged)
-    print("shape of lagged_grand_ensemble_mean", np.shape(lagged_grand_ensemble_mean))
-    print("lagged_grand_ensemble_mean", lagged_grand_ensemble_mean)
-    
     # check the time output from this function
     print("shape of model_time_lagged", np.shape(model_time_lagged))
     print("model_time_lagged", model_time_lagged)
@@ -1095,27 +1175,31 @@ def plot_ensemble_members_and_lagged_adjusted_mean(models, model_times_by_model,
 
     # calculate the ACC (short and long) for the lagged grand ensemble mean
     acc_score_short_lagged, _ = pearsonr_score(obs_nao_anom, lagged_grand_ensemble_mean, model_time_lagged, obs_time, "1969-01-01","2010-12-31")
-    acc_score_long_lagged, _ = pearsonr_score(obs_nao_anom, lagged_grand_ensemble_mean, model_time_lagged, obs_time, "1969-01-01","2015-12-31")
+    acc_score_long_lagged, _ = pearsonr_score(obs_nao_anom, lagged_grand_ensemble_mean, model_time_lagged, obs_time, "1969-01-01","2019-12-31")
 
     # and for the grand ensemble mean
     acc_score_short, _ = pearsonr_score(obs_nao_anom, grand_ensemble_mean, list(model_times_by_model.values())[0], obs_time, "1966-01-01","2010-12-31")
     acc_score_long, _ = pearsonr_score(obs_nao_anom, grand_ensemble_mean, list(model_times_by_model.values())[0], obs_time, "1966-01-01","2019-12-31")
 
+    # before we calculate the RPC, we need to lag the all_ensemble_members_array
+    # using the function process_lagged_ensemble_members
+    lagged_ensemble_members, model_time_lagged_members = process_lagged_ensemble_members(all_ensemble_members_array, lag=lag, start_year=1969, end_year=2019)
+
     # calculate the RPC (short and long) for the lagged grand ensemble mean
-    rpc_short_lagged = calculate_rpc_time(acc_score_short_lagged, all_ensemble_members_array, list(model_times_by_model.values())[0], "1969-01-01","2010-12-31")
-    rpc_long_lagged = calculate_rpc_time(acc_score_long_lagged, all_ensemble_members_array, list(model_times_by_model.values())[0], "1969-01-01","2015-12-31")
+    rpc_short_lagged = calculate_rpc_time(acc_score_short_lagged, lagged_ensemble_members, model_time_lagged_members, "1969-01-01","2010-12-31")
+    rpc_long_lagged = calculate_rpc_time(acc_score_long_lagged, lagged_ensemble_members, model_time_lagged_members, "1969-01-01","2019-12-31")
 
     # print these rpc scores
-    # print(rpc_short_lagged)
-    # print(rpc_long_lagged)
+    print("RPC short lagged", rpc_short_lagged)
+    print("RPC long lagged", rpc_long_lagged)
 
     # and for the grand ensemble mean
     rpc_short = calculate_rpc_time(acc_score_short, all_ensemble_members_array, list(model_times_by_model.values())[0], "1966-01-01","2010-12-31")
     rpc_long = calculate_rpc_time(acc_score_long, all_ensemble_members_array, list(model_times_by_model.values())[0], "1966-01-01","2019-12-31")
 
-    # print(rpc_short)
-    # print(rpc_long)
-
+    # print these rpc scores
+    print("RPC short", rpc_short)
+    print("RPC long", rpc_long)
     #test
     #set rpc_short=10
     # replicate marcheggiani
@@ -1123,16 +1207,32 @@ def plot_ensemble_members_and_lagged_adjusted_mean(models, model_times_by_model,
     #rpc_short_lagged=10.1
     
     # print the time series before adjustment
-    print(lagged_grand_ensemble_mean)
+    #print(lagged_grand_ensemble_mean)
+
+    # calculate the RPS scores for the lagged grand ensemble mean
+    rps_score_short_lagged = calculate_rps_time(rpc_short_lagged, obs_nao_anom, lagged_ensemble_members, model_time_lagged_members, "1969-01-01","2010-12-31")
+    rps_score_long_lagged = calculate_rps_time(rpc_long_lagged, obs_nao_anom, lagged_ensemble_members, model_time_lagged_members, "1969-01-01","2019-12-31")
+
+    # now print the rps scores
+    print("RPS short lagged", rps_score_short_lagged)
+    print("RPS long lagged", rps_score_long_lagged)
 
     # apply the variance adjustment (via RPC scaling) to the lagged grand ensemble mean
-    lagged_adjusted_grand_ensemble_mean_short, lagged_adjusted_grand_ensemble_mean_long = adjust_variance(lagged_grand_ensemble_mean,rpc_short_lagged,rpc_long_lagged)
+    lagged_adjusted_grand_ensemble_mean_short, lagged_adjusted_grand_ensemble_mean_long = adjust_variance(lagged_grand_ensemble_mean,rpc_short_lagged, rpc_long_lagged)
 
-    print(lagged_adjusted_grand_ensemble_mean_short)
-    print(lagged_adjusted_grand_ensemble_mean_long)
+    print("rpc adjust shape", np.shape(lagged_adjusted_grand_ensemble_mean_long))
     
+    # apply the variance adjustment (via RPS scaling) to the grand ensemble mean
+    adjusted_grand_ensemble_mean_short_rps, adjusted_grand_ensemble_mean_long_rps = adjust_variance(lagged_grand_ensemble_mean,rps_score_short_lagged, rps_score_long_lagged)
+
+    print("rps adjust shape", np.shape(adjusted_grand_ensemble_mean_long_rps))
+
     # Also just apply the variance adjustment to the grand ensemble mean
     adjusted_grand_ensemble_mean_short, adjusted_grand_ensemble_mean_long = adjust_variance(grand_ensemble_mean,rpc_short,rpc_long)
+
+    # with the RPS scaling
+    nolag_adjusted_grand_ensemble_mean_short_rps, nolag_adjusted_grand_ensemble_mean_long_rps = adjust_variance(grand_ensemble_mean,rps_score_short_lagged,rps_score_long_lagged)
+
 
     # Calculate the ACC score using the function pearsonr_score with the lagged and adjusted grand ensemble mean
 
@@ -1150,16 +1250,15 @@ def plot_ensemble_members_and_lagged_adjusted_mean(models, model_times_by_model,
     # we chose to use the SHORT version of RPC lagged adjusted grand ensmeble mean
     
     #  for the short period
-    acc_score_short, p_value_short = pearsonr_score(obs_nao_anom, lagged_adjusted_grand_ensemble_mean_short, model_time_lagged, obs_time, "1969-01-01","2010-12-31")
+    acc_score_short, p_value_short = pearsonr_score(obs_nao_anom, adjusted_grand_ensemble_mean_short_rps, model_time_lagged, obs_time, "1969-01-01","2010-12-31")
 
     # for the long period
-    acc_score_long, p_value_long = pearsonr_score(obs_nao_anom, lagged_adjusted_grand_ensemble_mean_short, model_time_lagged, obs_time, "1969-01-01","2015-12-31")
+    acc_score_long, p_value_long = pearsonr_score(obs_nao_anom, adjusted_grand_ensemble_mean_long_rps, model_time_lagged, obs_time, "1969-01-01","2019-12-31")
 
     # calculate RPC score for short period
-    rpc_short = calculate_rpc_time(acc_score_short, all_ensemble_members_array, list(model_times_by_model.values())[0], "1969-01-01","2010-12-31")
-
+    rpc_short = calculate_rpc_time(acc_score_short, lagged_ensemble_members, model_time_lagged_members, "1969-01-01","2010-12-31")
     # calculate RPC score for long period
-    rpc_long = calculate_rpc_time(acc_score_long, all_ensemble_members_array, list(model_times_by_model.values())[0], "1969-01-01","2015-12-31")
+    rpc_long = calculate_rpc_time(acc_score_long, lagged_ensemble_members, model_time_lagged_members, "1969-01-01","2019-12-31")
 
     # print(obs_time[6:])
     # print(model_time_lagged)
@@ -1169,10 +1268,13 @@ def plot_ensemble_members_and_lagged_adjusted_mean(models, model_times_by_model,
     # print(lagged_adjusted_grand_ensemble_mean)
     
     # Calculate the 5-95% confidence intervals using compute_rmse_confidence_intervals
-    conf_interval_lower, conf_interval_upper = compute_rmse_confidence_intervals(obs_nao_anom, lagged_adjusted_grand_ensemble_mean_short, obs_time, model_time_lagged)
+    conf_interval_lower, conf_interval_upper = compute_rmse_confidence_intervals(obs_nao_anom, adjusted_grand_ensemble_mean_long_rps, obs_time, model_time_lagged)
 
     # Plot the grand ensemble mean with the ACC score in the legend
-    ax.plot(model_time_lagged, lagged_adjusted_grand_ensemble_mean_short, color="red", label=f"DCPP-A")
+    ax.plot(model_time_lagged, lagged_adjusted_grand_ensemble_mean_long, color="red", label=f"DCPP-A")
+
+    # plot the RPS adjusted grand ensemble mean
+    ax.plot(model_time_lagged, adjusted_grand_ensemble_mean_long_rps, color="red", alpha=0.8, linestyle="-.", label=f"DCPP-A RPS")
 
     # print(np.shape(model_time_lagged))
     # print(np.shape(adjusted_grand_ensemble_mean[3:-5]))
@@ -1180,7 +1282,7 @@ def plot_ensemble_members_and_lagged_adjusted_mean(models, model_times_by_model,
     # print(list(model_times_by_model.values())[0][3:-5])
     
     # Plot the grand ensemble mean variance adjusted only
-    ax.plot(list(model_times_by_model.values())[0], adjusted_grand_ensemble_mean_short, color="red", alpha=0.8, linestyle="--")
+    ax.plot(list(model_times_by_model.values())[0], nolag_adjusted_grand_ensemble_mean_long_rps, color="red", alpha=0.8, linestyle="--", label="Adjust RPC Nolag")
 
     # Plot the 5-95% confidence intervals for the short period
     ax.fill_between(model_time_lagged[:-5], conf_interval_lower[:-5], conf_interval_upper[:-5], color="red", alpha=0.3)
