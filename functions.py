@@ -1290,7 +1290,7 @@ def plot_ensemble_members_and_lagged_adjusted_mean(models, model_times_by_model,
 
     # before calculating the rpc scores we want to adjust the variance for the lagged ensemble members
     # using the RPS scores and the function adjust_variance_members
-    lagged_adjusted_ensemble_members_short_rps, lagged_adjusted_ensemble_members_long_rps = adjust_variance_members(lagged_ensemble_members,rps_score_short_lagged, rps_score_long_lagged)
+    lagged_adjusted_ensemble_members_short_rps, lagged_adjusted_ensemble_members_long_rps = adjust_variance_ensemble(lagged_ensemble_members,rps_score_short_lagged, rps_score_long_lagged)
 
 
     # calculate RPC score for short period
