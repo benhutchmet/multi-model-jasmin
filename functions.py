@@ -1309,10 +1309,10 @@ def plot_ensemble_members_and_lagged_adjusted_mean(models, model_times_by_model,
     conf_interval_lower, conf_interval_upper = compute_rmse_confidence_intervals(obs_nao_anom, adjusted_grand_ensemble_mean_long_rps, obs_time, model_time_lagged)
 
     # Plot the grand ensemble mean with the ACC score in the legend
-    ax.plot(model_time_lagged, lagged_adjusted_grand_ensemble_mean_long, color="red", label=f"DCPP-A")
+    #ax.plot(model_time_lagged, lagged_adjusted_grand_ensemble_mean_long, color="red", label=f"DCPP-A")
 
     # plot the RPS adjusted grand ensemble mean
-    ax.plot(model_time_lagged, adjusted_grand_ensemble_mean_long_rps, color="red", alpha=0.8, linestyle="-.", label=f"DCPP-A RPS")
+    ax.plot(model_time_lagged, adjusted_grand_ensemble_mean_long_rps, color="red", label=f"DCPP-A")
 
     # print(np.shape(model_time_lagged))
     # print(np.shape(adjusted_grand_ensemble_mean[3:-5]))
@@ -1320,7 +1320,7 @@ def plot_ensemble_members_and_lagged_adjusted_mean(models, model_times_by_model,
     # print(list(model_times_by_model.values())[0][3:-5])
     
     # Plot the grand ensemble mean variance adjusted only
-    ax.plot(list(model_times_by_model.values())[0], nolag_adjusted_grand_ensemble_mean_long_rps, color="red", alpha=0.8, linestyle="--", label="Adjust RPC Nolag")
+    ax.plot(list(model_times_by_model.values())[0], nolag_adjusted_grand_ensemble_mean_long_rps, color="red", alpha=0.8, linewidth=0.8)
 
     # Plot the 5-95% confidence intervals for the short period
     ax.fill_between(model_time_lagged[:-5], conf_interval_lower[:-5], conf_interval_upper[:-5], color="red", alpha=0.3)
@@ -1754,7 +1754,7 @@ def calculate_acc_by_ensemble_size(models, model_nao_anoms_by_model, model_times
 
     # calculate whether the difference between the short and long period ACC scores is significant
     # using a 2-sample t-test
-    t_stat, p_val = ttest_ind(acc_scores_short, acc_scores_long)
+    # t_stat, p_val = ttest_ind(acc_scores_short, acc_scores_long)
 
     # Plot the 5-95% confidence intervals
     # for the short period
@@ -1762,22 +1762,22 @@ def calculate_acc_by_ensemble_size(models, model_nao_anoms_by_model, model_times
     # for the long period
     ax.fill_between(ensemble_sizes, conf_ints_lower_long, conf_ints_upper_long, color="blue", alpha=0.2)
 
+    ax.set_xlabel("Number of ensemble members")
+    ax.set_ylabel("ACC score")
+    #ax.set_title("ACC score by ensemble size")
+
+    # use a title for the plot which indicates whether the difference between the short and long period ACC scores is significant
+    #ax.set_title(f"ACC score by ensemble size (p={p_val:.3f})")
+
+    # Add a legend in the bottom right corner
+    ax.legend(loc="lower right")
+
     # Save the figure
     # In the plots_dir directory
     # with the current date
     # and the step size in the filename
     # and the number of samples in the filename
     fig.savefig(os.path.join(plots_dir, f"nao_acc_by_ensemble_size_{datetime.now().strftime('%Y-%m-%d')}_{step_size}_{num_samples}.png"), dpi=300)
-
-    ax.set_xlabel("Number of ensemble members")
-    ax.set_ylabel("ACC score")
-    ax.set_title("ACC score by ensemble size")
-
-    # use a title for the plot which indicates whether the difference between the short and long period ACC scores is significant
-    ax.set_title(f"ACC score by ensemble size (p={p_val:.3f})")
-
-    # Add a legend in the bottom right corner
-    ax.legend(loc="lower right")
 
     # Show the figure
     plt.show()
