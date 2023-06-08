@@ -174,6 +174,11 @@ def pearsonr_score(obs, model, model_times, obs_times, start_date, end_date):
     # Convert obs_times to an array of Timestamp objects
     obs_times = np.vectorize(pd.Timestamp)(obs_times)
 
+    # debugging for NAO matching
+    print("model times", model_times)
+    print("model times shape", np.shape(model_times))
+    print("model times type", type(model_times))
+
     # Analyze dimensions of model_times and obs_times
     model_start_index = np.where(model_times == start_date)[0][0]
     model_end_index = np.where(model_times <= end_date)[0][-1]
@@ -1288,10 +1293,17 @@ def plot_ensemble_members_and_lagged_adjusted_mean(models, model_times_by_model,
     # for the long period
     acc_score_long, p_value_long = pearsonr_score(obs_nao_anom, adjusted_grand_ensemble_mean_long_rps, model_time_lagged, obs_time, "1969-01-01","2019-12-31")
 
+    print("lagged ensemble members", lagged_ensemble_members[0,:])
+    print("rps score short lagged", rps_score_short_lagged)
+    print("rps score long lagged", rps_score_long_lagged)
+
     # before calculating the rpc scores we want to adjust the variance for the lagged ensemble members
     # using the RPS scores and the function adjust_variance_members
     lagged_adjusted_ensemble_members_short_rps, lagged_adjusted_ensemble_members_long_rps = adjust_variance_ensemble(lagged_ensemble_members,rps_score_short_lagged, rps_score_long_lagged)
 
+    # print some values here to check
+    print("lagged adjusted ensemble members short", lagged_adjusted_ensemble_members_short_rps[0,:])
+    print("lagged adjusted ensemble members long", lagged_adjusted_ensemble_members_long_rps[0,:])
 
     # calculate RPC score for short period
     rpc_short = calculate_rpc_time(acc_score_short, lagged_adjusted_ensemble_members_short_rps, model_time_lagged_members, "1969-01-01","2010-12-31")

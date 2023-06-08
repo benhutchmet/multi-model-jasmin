@@ -174,6 +174,11 @@ def pearsonr_score(obs, model, model_times, obs_times, start_date, end_date):
     # Convert obs_times to an array of Timestamp objects
     obs_times = np.vectorize(pd.Timestamp)(obs_times)
 
+    # debugging for NAO matching
+    print("model times", model_times)
+    print("model times shape", np.shape(model_times))
+    print("model times type", type(model_times))
+
     # Analyze dimensions of model_times and obs_times
     model_start_index = np.where(model_times == start_date)[0][0]
     model_end_index = np.where(model_times <= end_date)[0][-1]
