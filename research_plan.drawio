@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e">
     <diagram name="Page-1" id="C7xBqoRl-2ZH1QGe7lWn">
-        <mxGraphModel dx="1658" dy="1394" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+        <mxGraphModel dx="2223" dy="1531" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -10,7 +10,7 @@
                 <mxCell id="MYsyzhye_xoifdE90jc8-1" value="&lt;div&gt;Decadal forecasting research&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;" parent="1" vertex="1">
                     <mxGeometry x="131" y="168" width="120" height="60" as="geometry"/>
                 </mxCell>
-                <mxCell id="MYsyzhye_xoifdE90jc8-2" value="" style="endArrow=classic;html=1;rounded=0;fontSize=12;startSize=8;endSize=8;curved=1;exitX=1;exitY=0;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="MYsyzhye_xoifdE90jc8-1" edge="1" target="MYsyzhye_xoifdE90jc8-3">
+                <mxCell id="MYsyzhye_xoifdE90jc8-2" value="" style="endArrow=classic;html=1;rounded=0;fontSize=12;startSize=8;endSize=8;curved=1;exitX=1;exitY=0;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="MYsyzhye_xoifdE90jc8-1" target="MYsyzhye_xoifdE90jc8-3" edge="1">
                     <mxGeometry width="50" height="50" relative="1" as="geometry">
                         <mxPoint x="242" y="228" as="sourcePoint"/>
                         <mxPoint x="412" y="52" as="targetPoint"/>
@@ -37,13 +37,13 @@
                 <mxCell id="MYsyzhye_xoifdE90jc8-5" value="Lagged + var. adjust" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;" parent="1" vertex="1">
                     <mxGeometry x="568" y="-85" width="120" height="60" as="geometry"/>
                 </mxCell>
-                <mxCell id="MYsyzhye_xoifdE90jc8-6" value="" style="endArrow=classic;html=1;rounded=0;fontSize=12;startSize=8;endSize=8;curved=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=0.75;exitY=0;exitDx=0;exitDy=0;" parent="1" target="MYsyzhye_xoifdE90jc8-4" edge="1" source="MYsyzhye_xoifdE90jc8-3">
+                <mxCell id="MYsyzhye_xoifdE90jc8-6" value="" style="endArrow=classic;html=1;rounded=0;fontSize=12;startSize=8;endSize=8;curved=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=0.75;exitY=0;exitDx=0;exitDy=0;" parent="1" source="MYsyzhye_xoifdE90jc8-3" target="MYsyzhye_xoifdE90jc8-4" edge="1">
                     <mxGeometry width="50" height="50" relative="1" as="geometry">
                         <mxPoint x="540" y="10" as="sourcePoint"/>
                         <mxPoint x="590" y="-40" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="MYsyzhye_xoifdE90jc8-7" value="" style="endArrow=classic;html=1;rounded=0;fontSize=12;startSize=8;endSize=8;curved=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=1;exitY=0.25;exitDx=0;exitDy=0;" parent="1" target="MYsyzhye_xoifdE90jc8-5" edge="1" source="MYsyzhye_xoifdE90jc8-3">
+                <mxCell id="MYsyzhye_xoifdE90jc8-7" value="" style="endArrow=classic;html=1;rounded=0;fontSize=12;startSize=8;endSize=8;curved=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=1;exitY=0.25;exitDx=0;exitDy=0;" parent="1" source="MYsyzhye_xoifdE90jc8-3" target="MYsyzhye_xoifdE90jc8-5" edge="1">
                     <mxGeometry width="50" height="50" relative="1" as="geometry">
                         <mxPoint x="550" y="20" as="sourcePoint"/>
                         <mxPoint x="606" y="-42" as="targetPoint"/>
@@ -58,13 +58,13 @@
                 <mxCell id="MYsyzhye_xoifdE90jc8-10" value="Complete?" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;" parent="1" vertex="1">
                     <mxGeometry x="774" y="2" width="104" height="40" as="geometry"/>
                 </mxCell>
-                <mxCell id="MYsyzhye_xoifdE90jc8-11" value="" style="endArrow=classic;html=1;rounded=0;fontSize=12;startSize=8;endSize=8;curved=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=1;exitY=0.25;exitDx=0;exitDy=0;" parent="1" target="MYsyzhye_xoifdE90jc8-10" edge="1" source="MYsyzhye_xoifdE90jc8-5">
+                <mxCell id="MYsyzhye_xoifdE90jc8-11" value="" style="endArrow=classic;html=1;rounded=0;fontSize=12;startSize=8;endSize=8;curved=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=1;exitY=0.25;exitDx=0;exitDy=0;" parent="1" source="MYsyzhye_xoifdE90jc8-5" target="MYsyzhye_xoifdE90jc8-10" edge="1">
                     <mxGeometry width="50" height="50" relative="1" as="geometry">
                         <mxPoint x="728" y="47" as="sourcePoint"/>
                         <mxPoint x="776" y="53" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="MYsyzhye_xoifdE90jc8-12" value="" style="endArrow=classic;html=1;rounded=0;fontSize=12;startSize=8;endSize=8;curved=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=1;exitY=0.75;exitDx=0;exitDy=0;" parent="1" target="MYsyzhye_xoifdE90jc8-9" edge="1" source="MYsyzhye_xoifdE90jc8-5">
+                <mxCell id="MYsyzhye_xoifdE90jc8-12" value="" style="endArrow=classic;html=1;rounded=0;fontSize=12;startSize=8;endSize=8;curved=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=1;exitY=0.75;exitDx=0;exitDy=0;" parent="1" source="MYsyzhye_xoifdE90jc8-5" target="MYsyzhye_xoifdE90jc8-9" edge="1">
                     <mxGeometry width="50" height="50" relative="1" as="geometry">
                         <mxPoint x="725" y="34" as="sourcePoint"/>
                         <mxPoint x="784" y="32" as="targetPoint"/>
@@ -83,7 +83,7 @@
                 <mxCell id="MYsyzhye_xoifdE90jc8-17" value="&lt;font color=&quot;#ff3333&quot;&gt;Waiting for Doug code&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;" parent="1" vertex="1">
                     <mxGeometry x="731" y="112" width="104" height="40" as="geometry"/>
                 </mxCell>
-                <mxCell id="MYsyzhye_xoifdE90jc8-18" value="" style="endArrow=classic;html=1;rounded=0;fontSize=12;startSize=8;endSize=8;curved=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" parent="1" edge="1" source="MYsyzhye_xoifdE90jc8-15">
+                <mxCell id="MYsyzhye_xoifdE90jc8-18" value="" style="endArrow=classic;html=1;rounded=0;fontSize=12;startSize=8;endSize=8;curved=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" parent="1" source="MYsyzhye_xoifdE90jc8-15" edge="1">
                     <mxGeometry width="50" height="50" relative="1" as="geometry">
                         <mxPoint x="725" y="120" as="sourcePoint"/>
                         <mxPoint x="729" y="113" as="targetPoint"/>
@@ -121,7 +121,7 @@
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
                 <mxCell id="MYsyzhye_xoifdE90jc8-22" value="Replicate MSLP skill map NA" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;" parent="1" vertex="1">
-                    <mxGeometry x="604" y="247" width="120" height="60" as="geometry"/>
+                    <mxGeometry x="604" y="238" width="120" height="60" as="geometry"/>
                 </mxCell>
                 <mxCell id="MYsyzhye_xoifdE90jc8-23" value="&lt;div&gt;Winter in paper&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;" parent="1" vertex="1">
                     <mxGeometry x="783" y="209" width="99" height="38" as="geometry"/>
