@@ -23,6 +23,93 @@ from functions import *
 #  and the associated time array
 import datetime as dt
 
+# Define a new function to lag the ensemble
+def lag_ensemble(ensemble_members_array, ensemble_members_time, lag=4):
+    """
+    Lag the ensemble members array by combining each year with the previous lag-1 years.
+
+    Parameters
+    ----------
+    ensemble_members_array : numpy.ndarray
+        A 2D array of shape (n_ensemble_members, n_years) containing the ensemble members.
+    ensemble_members_time : numpy.ndarray
+        A 1D array of length n_years containing the time values for each year in the ensemble.
+    lag : int, optional
+        The number of years to lag the ensemble by. Default is 4.
+
+    Returns
+    -------
+    lagged_ensemble_members_array : numpy.ndarray
+        A 2D array of shape (n_ensemble_members * (n_years - lag + 1), lag) containing the lagged ensemble members.
+    lagged_ensemble_members_time : numpy.ndarray
+        A 1D array of length n_years - lag + 1 containing the time values for each year in the lagged ensemble.
+    """
+
+    # check that the ensemble members array and ensemble members time are the same length
+    # if not, raise an error and exit the function
+    if ensemble_members_array.shape[1] != ensemble_members_time.shape[0]:
+        raise ValueError('ensemble_members_array and ensemble_members_time must be the same length')
+    
+    
+    # make sure that ensemble_members_array is a numpy array
+    # if not, convert it to a numpy array
+    if type(ensemble_members_array) != np.ndarray:
+        ensemble_members_array = np.array(ensemble_members_array)
+    
+    # make sure that ensemble_members_time is a numpy array
+    # if not, convert it to a numpy array
+    if type(ensemble_members_time) != np.ndarray:
+        ensemble_members_time = np.array(ensemble_members_time)
+    
+    # get the number of ensemble members
+    n_ensemble_members = ensemble_members_array.shape[0]
+    
+    # get the number of years
+    n_years = ensemble_members_array.shape[1]
+    
+    # create an empty array to store the lagged ensemble members
+    # this will have shape 
+    # [lag*n_ensemble_members,n_years]
+    lagged_ensemble_members_array = np.empty((lag*n_ensemble_members,n_years))
+
+    # create an empty array to store the lagged ensemble members time
+    # this will have shape [(n_years - lag) + 1]
+    lagged_ensemble_members_time = np.empty((n_years - lag) + 1, dtype='datetime64[ns]')
+
+    # Fill the values for the ensemble members time array
+    # this will include all of the values of ensemble members time
+    # except for the first lag-1 years
+    # this is because we are lagging the ensemble by lag-1 years
+    lagged_ensemble_members_time = ensemble_members_time[lag-1:]
+
+    # loop over each ensemble member
+    for i in range(n_ensemble_members):
+        # loop over each year
+        for j in range(n_years):
+            # if the year is less than lag-1
+            if j < lag-1:
+                # set the value of the lagged ensemble members array to NaN
+                lagged_ensemble_members_array[i,j] = np.nan
+            # if the year is greater than or equal to lag-1
+            else:
+                # loop over each lag
+                for k in range(lag):
+                    # set the value of the lagged ensemble members array
+                    # to the ensemble members array value
+                    # for the ensemble member i
+                    # and the year j-k
+                    lagged_ensemble_members_array[i*lag+k,j] = ensemble_members_array[i,j-k]
+
+    # exclude the Nans from the returned lagged array
+    lagged_ensemble_members_array = lagged_ensemble_members_array[:,3:]                
+    # check the lagged ensemble members array
+    print("lagged ensemble members_array", lagged_ensemble_members_array)
+    
+    # return the lagged ensemble members array and the lagged ensemble members time
+    return lagged_ensemble_members_array, lagged_ensemble_members_time
+
+
+
 def signal_adjust_NAO_index(year, ensemble_members_array, ensemble_members_time, obs_nao_index, obs_time):
     """
     Compute the signal-adjusted NAO index of the ensemble mean
@@ -104,11 +191,18 @@ def signal_adjust_NAO_index(year, ensemble_members_array, ensemble_members_time,
     print("obs time pre cross val", obs_time)
     print("model time pre cross val", ensemble_members_time)
 
-    obs_time_adjusted = obs_time[2:]
+    # change the shape of obs time depending on lagged or not
+    if ensemble_members_time.shape == (54,):
+        # Set up the indices for the obs_time_adjusted array
+        obs_time_adjusted = obs_time[2:]
+    elif ensemble_members_time.shape == (51,):
+        # Set up the indices for the obs_time_adjusted array
+        obs_time_adjusted = obs_time[5:]
+    else:
+        # Handle the case where the shape is neither (54,) nor (51,)
+        raise ValueError("Unexpected shape for ensemble_members_time: {}".format(ensemble_members_time.shape))
 
-    print("obs time adjusted", obs_time_adjusted)
-    print("model time pre cross val", ensemble_members_time)
-
+    # change the obs_time accordingly
     obs_time = obs_time_adjusted
         
     # look at the indicies
@@ -414,3 +508,67 @@ def plot_NAO_matched(models, model_times_by_model, model_nao_anoms_by_model, obs
 
     ax.legend(loc="lower right")
     plt.show()
+
+# Define a new function which plots the results of NAO matching
+# using the lagged array with 712 members
+def plot_NAO_matched_lagged(models, model_times_by_model, model_nao_anoms_by_model, obs_nao_anom, obs_time, years, n_members_to_select, lag):
+    """ Plot the results of NAO matching methodology for lagged ensemble.
+
+    Parameters
+    ----------
+    models : dict
+        A dictionary containing a list of models.
+    model_times_by_model : dict
+        A dictionary containing model times for each model.
+    model_nao_anoms_by_model : dict
+        A dictionary containing model NAO anomalies for each model.
+    obs_nao_anom : numpy.ndarray
+        The observed NAO anomalies time series.
+    obs_time : 
+
+    Returns
+    -------
+    None
+    """
+
+    # Create a figure
+    fig, ax = plt.subplots(figsize=(10, 6))
+
+    # Initialize a list to store results
+    all_ensemble_members = []
+
+    # Iterate over the models
+    for model_name in models:
+        model_time = model_times_by_model[model_name]
+        model_nao_anom = model_nao_anoms_by_model[model_name]
+
+        for member in model_nao_anom:
+            all_ensemble_members.append(member)
+
+    # Make sure tha all_ensemble_members is an array
+    all_ensemble_members = np.array(all_ensemble_members)
+
+    # Call the lag ensemble function
+    lagged_ensemble_members_array, lagged_ensemble_members_time = lag_ensemble(all_ensemble_members, list(model_times_by_model.values())[0], lag=lag)
+
+    # Call the NAO matching function
+    results = nao_matching(years, lagged_ensemble_members_array, lagged_ensemble_members_time, obs_nao_anom, obs_time, n_members_to_select)
+
+    # Extract the years and the mean of selected members from the results array
+    years, nao_matched_nao_anom_lagged = results[:, 0], results[:, 1]
+
+    # Plot the NAO index of the selected members
+    ax.plot(years, nao_matched_nao_anom_lagged, color='red', label='NAO-matched DCPP-A lagged')
+
+    # Plot the observed NAO index 
+    ax.plot(obs_time, obs_nao_anom, color='black', label='Observations')
+
+    ax.axhline(y=0, color='black', linestyle='-', linewidth=0.5)
+    ax.set_xlim([np.datetime64("1960"), np.datetime64("2020")])
+    ax.set_ylim([-10, 10])
+    ax.set_xlabel("Year")
+    ax.set_ylabel("NAO anomalies (hPa)")
+
+    ax.legend(loc="lower right")
+    plt.show()
+   

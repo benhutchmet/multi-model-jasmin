@@ -100,9 +100,10 @@ def lag_ensemble(ensemble_members_array, ensemble_members_time, lag=4):
                     # and the year j-k
                     lagged_ensemble_members_array[i*lag+k,j] = ensemble_members_array[i,j-k]
 
-    # print the dimensions of the lagged ensemble members array
-    # for debugging purposes
-    print("lagged_ensemble_members_array.shape = ", lagged_ensemble_members_array.shape)
+    # exclude the Nans from the returned lagged array
+    lagged_ensemble_members_array = lagged_ensemble_members_array[:,3:]                
+    # check the lagged ensemble members array
+    print("lagged ensemble members_array", lagged_ensemble_members_array)
     
     # return the lagged ensemble members array and the lagged ensemble members time
     return lagged_ensemble_members_array, lagged_ensemble_members_time
@@ -190,11 +191,18 @@ def signal_adjust_NAO_index(year, ensemble_members_array, ensemble_members_time,
     print("obs time pre cross val", obs_time)
     print("model time pre cross val", ensemble_members_time)
 
-    obs_time_adjusted = obs_time[2:]
+    # change the shape of obs time depending on lagged or not
+    if ensemble_members_time.shape == (54,):
+        # Set up the indices for the obs_time_adjusted array
+        obs_time_adjusted = obs_time[2:]
+    elif ensemble_members_time.shape == (51,):
+        # Set up the indices for the obs_time_adjusted array
+        obs_time_adjusted = obs_time[5:]
+    else:
+        # Handle the case where the shape is neither (54,) nor (51,)
+        raise ValueError("Unexpected shape for ensemble_members_time: {}".format(ensemble_members_time.shape))
 
-    print("obs time adjusted", obs_time_adjusted)
-    print("model time pre cross val", ensemble_members_time)
-
+    # change the obs_time accordingly
     obs_time = obs_time_adjusted
         
     # look at the indicies
