@@ -568,10 +568,23 @@ def plot_NAO_matched_lagged(models, model_times_by_model, model_nao_anoms_by_mod
     # Call the NAO matching function
     results, results_members = nao_matching(years, lagged_ensemble_members_array, lagged_ensemble_members_time, obs_nao_anom, obs_time, n_members_to_select)
 
+    # Convert results members to an array
+    results_members_array = np.array(results_members)
+    
     # Look at the dimensions of the results members
-    print("The dimensions of the results members are: ", results_members.shape)
-    print("Results members are: ", results_members)
+    print("The dimensions of the results members are: ", np.shape(results_members))
+    #print("Results members are: ", results_members)
 
+    # Extract just the arrays of 20 members and stack them into a new array
+    reformatted_array = np.array([item[1].flatten() for item in results_members])
+
+    # have a look at this
+    print("the reformatted array has shape:", np.shape(reformatted_array))
+    #print("the reformatted array", reformatted_array)
+
+    # set results members to be the reformatted array
+    results_members = reformatted_array
+    
     # Extract the years and the mean of selected members from the results array
     years, nao_matched_nao_anom_lagged = results[:, 0], results[:, 1]
 
@@ -586,9 +599,15 @@ def plot_NAO_matched_lagged(models, model_times_by_model, model_nao_anoms_by_mod
     # Call the function to calculate the confidence intervals
     ci_5, ci_95 = calculate_confidence_intervals(results_members, alpha=0.05)
 
+
+    # print the shape of the confidence intervals
+    print(np.shape(ci_5))
+    print(np.shape(ci_95))
+    print(np.shape(years))
+
     # Add the confidence intervals to the plot
-    ax.fill_between(years, ci_5[:-9], ci_95[:-9], color='red', alpha=0.3)
-    ax.fill_between(years, ci_5[-10:], ci_95[-10:], color='red', alpha=0.2)
+    ax.fill_between(years[:-9], ci_5[:-9], ci_95[:-9], color='red', alpha=0.3)
+    ax.fill_between(years[-10:], ci_5[-10:], ci_95[-10:], color='red', alpha=0.2)
 
     # Plot the observed NAO index 
     ax.plot(obs_time, obs_nao_anom, color='black', label='Observations')
