@@ -5,6 +5,7 @@
 
 # Import libraries which may be used by the functions
 import os
+import sys
 import xarray as xr
 import numpy as np
 import pandas as pd
@@ -15,6 +16,9 @@ from sklearn.utils import resample
 from datetime import datetime
 
 # Also load the dictionaries from dictionaries.py
+sys.path.append("/home/users/benhutch/multi-model/multi-model-jasmin/dictionaries")
+
+# Import the dictionaries
 from dictionaries import *
 
 # Function which loads each of the individual ensemble members \\

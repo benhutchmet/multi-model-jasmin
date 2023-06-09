@@ -1,6 +1,7 @@
 # testing NAO-matching methodology
 
 # import libraries
+import sys
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -11,8 +12,15 @@ import xarray as xr
 from scipy.stats import t
 
 # import dictionaries
+# and functions
+# Also load the dictionaries from dictionaries.py
+sys.path.append("/home/users/benhutch/multi-model/multi-model-jasmin/dictionaries")
 from dictionaries import *
+
+# modules
+sys.path.append("/home/users/benhutch/multi-model/multi-model-jasmin/functions")
 from functions import *
+
 
 # Define a function to calculate the confidence intervals
 def calculate_confidence_intervals(ensemble, alpha=0.05):
