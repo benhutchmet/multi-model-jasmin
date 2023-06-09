@@ -1,6 +1,8 @@
 # testing NAO-matching methodology
 
 # import libraries
+import os
+import sys
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -8,11 +10,148 @@ import matplotlib.dates as mdates
 import datetime as dt
 import scipy.stats as stats
 import xarray as xr
-from scipy.stats import t
+from scipy.stats import t, pearsonr
 
 # import dictionaries
+# and functions
+# Also load the dictionaries from dictionaries.py
+# sys.path.append("../dictionaries")
 from dictionaries import *
-from functions import *
+
+# Function to calculate the ACC and significance
+def pearsonr_score(obs, model, model_times, obs_times, start_date, end_date):
+    """
+    Calculate the Pearson correlation coefficient and p-value between two time series,
+    considering the dimensions of the model and observation time arrays.
+
+    Parameters:
+    obs (array-like): First time series (e.g., observations)
+    model (array-like): Second time series (e.g., model mean)
+    model_times (array-like): Datetime array corresponding to the model time series
+    obs_times (array-like): Datetime array corresponding to the observation time series
+    start_date (str): Start date (inclusive) in the format 'YYYY-MM-DD'
+    end_date (str): End date (inclusive) in the format 'YYYY-MM-DD'
+
+    Returns:
+    tuple: Pearson correlation coefficient and p-value
+    """
+
+    # Ensure the time series are numpy arrays or pandas Series
+    time_series1 = np.array(obs)
+    time_series2 = np.array(model)
+
+    # Ensure the start_date and end_date are pandas Timestamp objects
+    start_date = pd.Timestamp(start_date)
+    end_date = pd.Timestamp(end_date)
+
+    # Convert obs_times to an array of Timestamp objects
+    obs_times = np.vectorize(pd.Timestamp)(obs_times)
+
+    # debugging for NAO matching
+    # print("model times", model_times)
+    # print("model times shape", np.shape(model_times))
+    # print("model times type", type(model_times))
+
+    # Analyze dimensions of model_times and obs_times
+    model_start_index = np.where(model_times == start_date)[0][0]
+    model_end_index = np.where(model_times <= end_date)[0][-1]
+    obs_start_index = np.where(obs_times >= start_date)[0][0]
+    obs_end_index = np.where(obs_times <= end_date)[0][-1]
+
+    # Filter the time series based on the analyzed dimensions
+    filtered_time_series1 = time_series1[obs_start_index:obs_end_index+1]
+    filtered_time_series2 = time_series2[model_start_index:model_end_index+1]
+
+    # Calculate the Pearson correlation coefficient and p-value
+    correlation_coefficient, p_value = pearsonr(filtered_time_series1, filtered_time_series2)
+
+    return correlation_coefficient, p_value
+
+def calculate_rpc_time(correlation_coefficient, forecast_members, model_times, start_date, end_date):
+    """
+    Calculate the Ratio of Predictable Components (RPC) given the correlation
+    coefficient (ACC) and individual forecast members for a specific time period.
+
+    Parameters:
+    correlation_coefficient (float): Correlation coefficient (ACC)
+    forecast_members (array-like): Individual forecast members
+    model_times (array-like): Datetime array corresponding to the model time series
+    start_date (str): Start date (inclusive) in the format 'YYYY-MM-DD'
+    end_date (str): End date (inclusive) in the format 'YYYY-MM-DD'
+
+    Returns:
+    float: Ratio of Predictable Components (RPC)
+    """
+
+    # Convert the input arrays to numpy arrays
+    forecast_members = np.array(forecast_members)
+
+    # Convert the start_date and end_date to pandas Timestamp objects
+    start_date = pd.Timestamp(start_date)
+    end_date = pd.Timestamp(end_date)
+
+    # Find the start and end indices of the time period for the model
+    model_start_index = np.where(model_times >= start_date)[0][0]
+    model_end_index = np.where(model_times <= end_date)[0][-1]
+
+    # Filter the forecast members based on the start and end indices
+    forecast_members = forecast_members[:, model_start_index:model_end_index+1]
+
+    # Calculate the standard deviation of the predictable signal for forecasts (σfsig)
+    sigma_fsig = np.std(np.mean(forecast_members, axis=0))
+
+    # Calculate the total standard deviation for forecasts (σftot)
+    sigma_ftot = np.std(forecast_members)
+
+    # Calculate the RPC
+    rpc = correlation_coefficient / (sigma_fsig / sigma_ftot)
+
+    return rpc
+
+# getting desperate lol
+def calculate_rps_time(RPC, obs, forecast_members, model_times, start_date, end_date):
+    """
+    Calculate the Ratio of Predictable Signals (RPS) given the Ratio of Predictable
+    Components (RPC), observations, individual forecast members, and a time period.
+
+    Parameters:
+    RPC (float): Ratio of Predictable Components (RPC)
+    obs (array-like): Observations
+    forecast_members (array-like): Individual forecast members
+    model_times (array-like): Datetime array corresponding to the model time series
+    start_date (str): Start date (inclusive) in the format 'YYYY-MM-DD'
+    end_date (str): End date (inclusive) in the format 'YYYY-MM-DD'
+
+    Returns:
+    float: Ratio of Predictable Signals (RPS)
+    """
+
+    # Convert the input arrays to numpy arrays
+    obs = np.array(obs)
+    forecast_members = np.array(forecast_members)
+
+    # Convert the start_date and end_date to pandas Timestamp objects
+    start_date = pd.Timestamp(start_date)
+    end_date = pd.Timestamp(end_date)
+
+    # Find the start and end indices of the time period for the model
+    model_start_index = np.where(model_times >= start_date)[0][0]
+    model_end_index = np.where(model_times <= end_date)[0][-1]
+
+    # Filter the forecast members based on the start and end indices
+    forecast_members = forecast_members[:, model_start_index:model_end_index+1]
+
+    # Calculate the total variance of the observations
+    variance_obs = np.std(obs)
+
+    # Calculate the total variance of the forecast members
+    variance_forecast_members = np.std(forecast_members)
+
+    # Calculate the RPS
+    RPS = RPC * (variance_obs / variance_forecast_members)
+
+    return RPS
+
 
 # Define a function to calculate the confidence intervals
 def calculate_confidence_intervals(ensemble, alpha=0.05):
@@ -75,12 +214,23 @@ def lag_ensemble(ensemble_members_array, ensemble_members_time, lag=4):
         A 1D array of length n_years - lag + 1 containing the time values for each year in the lagged ensemble.
     """
 
-    # check that the ensemble members array and ensemble members time are the same length
-    # if not, raise an error and exit the function
+    # Convert ensemble_members_time to a numpy array
+    ensemble_members_time = np.array(ensemble_members_time)
+
+    # Convert ensemble_members_array to a numpy array
+    ensemble_members_array = np.array(ensemble_members_array)
+    
+    # print the shape and types of all of the input data
+    # Print the shape and types of the input data
+    print("ensemble_members_array shape:", np.shape(ensemble_members_array))
+    print("ensemble_members_array type:", type(ensemble_members_array))
+    print("ensemble_members_time shape:", np.shape(ensemble_members_time))
+    print("ensemble_members_time type:", type(ensemble_members_time))
+
+    # Check that the ensemble members array and ensemble members time are the same length
     if ensemble_members_array.shape[1] != ensemble_members_time.shape[0]:
         raise ValueError('ensemble_members_array and ensemble_members_time must be the same length')
-    
-    
+
     # make sure that ensemble_members_array is a numpy array
     # if not, convert it to a numpy array
     if type(ensemble_members_array) != np.ndarray:
@@ -634,6 +784,9 @@ def plot_NAO_matched_lagged(models, model_times_by_model, model_nao_anoms_by_mod
     
     # Set the title with the ACC and RPC scores
     ax.set_title(f"ACC = +{acc_score_short:.2f} (+{acc_score_long:.2f}), P {p_value_text_short} ({p_value_text_long}), RPC = +{rpc_short_lagged:.2f} (+{rpc_long_lagged:.2f}), N = {n_members}")
+    
+    # Save the figure
+    fig.savefig(os.path.join(plots_dir, f"nao_ensemble_mean_and_individual_members_nao_matched_lag_{lag}_{n_members}.png"), dpi=300)
 
     ax.legend(loc="lower right")
     plt.show()
