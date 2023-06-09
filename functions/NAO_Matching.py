@@ -88,7 +88,6 @@ def lag_ensemble(ensemble_members_array, ensemble_members_time, lag=4):
     if ensemble_members_array.shape[1] != ensemble_members_time.shape[0]:
         raise ValueError('ensemble_members_array and ensemble_members_time must be the same length')
     
-    
     # make sure that ensemble_members_array is a numpy array
     # if not, convert it to a numpy array
     if type(ensemble_members_array) != np.ndarray:
