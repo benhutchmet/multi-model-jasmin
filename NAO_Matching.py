@@ -133,7 +133,7 @@ def lag_ensemble(ensemble_members_array, ensemble_members_time, lag=4):
     # exclude the Nans from the returned lagged array
     lagged_ensemble_members_array = lagged_ensemble_members_array[:,3:]                
     # check the lagged ensemble members array
-    print("lagged ensemble members_array", lagged_ensemble_members_array)
+    #print("lagged ensemble members_array", lagged_ensemble_members_array)
     
     # return the lagged ensemble members array and the lagged ensemble members time
     return lagged_ensemble_members_array, lagged_ensemble_members_time
@@ -218,8 +218,8 @@ def signal_adjust_NAO_index(year, ensemble_members_array, ensemble_members_time,
         use_indices = np.where((ensemble_members_time != year_timestamp) & (ensemble_members_time != year_timestamp - pd.DateOffset(years=1)) & (ensemble_members_time != year_timestamp + pd.DateOffset(years=1)))[0]
 
     # look at the obs time and the ensemble members time
-    print("obs time pre cross val", obs_time)
-    print("model time pre cross val", ensemble_members_time)
+    # print("obs time pre cross val", obs_time)
+    # print("model time pre cross val", ensemble_members_time)
 
     # change the shape of obs time depending on lagged or not
     if ensemble_members_time.shape == (54,):
@@ -251,8 +251,8 @@ def signal_adjust_NAO_index(year, ensemble_members_array, ensemble_members_time,
     start_date = ensemble_members_time[0].astype(dt.datetime)
     end_date = ensemble_members_time[-1].astype(dt.datetime)
 
-    print('start_date', start_date)
-    print('end_date', end_date)
+    # print('start_date', start_date)
+    # print('end_date', end_date)
 
     # print('start_date types', type(start_date))
     # print('end_date types', type(end_date))
@@ -273,14 +273,14 @@ def signal_adjust_NAO_index(year, ensemble_members_array, ensemble_members_time,
     # for now, we will calculate ACC, RPC, and RPS for the long period only
     # we will add the short period later
     # check the time for the obs
-    print("obs time cross val", obs_time_cross_val)
-    print(np.shape(obs_time_cross_val))
-    print("model time cross val", ensemble_members_time_cross_val)
-    print(np.shape(ensemble_members_time_cross_val))
+    # print("obs time cross val", obs_time_cross_val)
+    # print(np.shape(obs_time_cross_val))
+    # print("model time cross val", ensemble_members_time_cross_val)
+    # print(np.shape(ensemble_members_time_cross_val))
 
-    print("model cross val grand ensemble shape", np.shape(grand_ensemble_mean_cross_val))
-    print("model cross val member array shape", np.shape(ensemble_members_array_cross_val))
-    print("obs cross val shape", np.shape(obs_nao_index_cross_val))
+    # print("model cross val grand ensemble shape", np.shape(grand_ensemble_mean_cross_val))
+    # print("model cross val member array shape", np.shape(ensemble_members_array_cross_val))
+    # print("obs cross val shape", np.shape(obs_nao_index_cross_val))
 
     # test the pearsonr scipy method for getting the ACC values
     acc_score_long, p_value = pearsonr(grand_ensemble_mean_cross_val, obs_nao_index_cross_val)
@@ -298,7 +298,7 @@ def signal_adjust_NAO_index(year, ensemble_members_array, ensemble_members_time,
     # Now multiply the ensemble mean NAO index by the RPS to get the signal-adjusted NAO index
     signal_adjusted_NAO_index = year_ensemble_mean_NAO * rps_score_long
 
-    print("from function signal adjusted nao index", signal_adjusted_NAO_index)
+    # print("from function signal adjusted nao index", signal_adjusted_NAO_index)
 
     # return the signal-adjusted NAO index
     return signal_adjusted_NAO_index
@@ -339,26 +339,12 @@ def select_nao_matching_members(year, ensemble_members_array, signal_adjusted_na
     mean_of_selected_members : float or None
         Mean of the selected N members, or None if there are not enough members available
     """
-
-    print("ensemble_members_array shape", np.shape(ensemble_members_array.flatten()))
-    print("signal adjusted nao index shape", np.shape(signal_adjusted_nao_index))
-    print("signal adjusted nao index", signal_adjusted_nao_index)
-
     
     # Repeat the value of signal_adjusted_nao_index to match the shape of ensemble_members_array
     signal_adjusted_nao_index = np.repeat(signal_adjusted_nao_index, len(ensemble_members_array))
 
-    print("signal adjusted nao index shape", np.shape(signal_adjusted_nao_index))
-    print("signal adjusted nao index", signal_adjusted_nao_index)
-
-    print("ensemble members array values", ensemble_members_array[:,0])
-    
     # Calculate absolute differences between the signal-adjusted NAO index and the NAO indices of individual ensemble members
     absolute_differences = np.abs(ensemble_members_array[:,0] - signal_adjusted_nao_index)
-
-    # print this and its shape for debugging
-    print("shape of absolute differences", np.shape(absolute_differences))
-    print("absolute differences", absolute_differences)
 
     # Find the indices of the N members with the smallest absolute differences
     smallest_diff_indices = np.argsort(absolute_differences)[:n_members_to_select]
@@ -427,25 +413,13 @@ def nao_matching(years, ensemble_members_array, ensemble_members_time, obs_nao_i
 
     # Loop through each year
     for year in years:
-
-        print("members array shape pre signal adjust", np.shape(ensemble_members_array))
         
         # Compute the signal-adjusted NAO index of the ensemble mean for the current year
         signal_adjusted_nao_index = signal_adjust_NAO_index(year, ensemble_members_array, ensemble_members_time, obs_nao_index, obs_time)
 
-        print("members array shape post signal adjust", np.shape(ensemble_members_array))
-        print("signal adjusted nao index shape", np.shape(signal_adjusted_nao_index))
-        print("signal adjusted nao index", signal_adjusted_nao_index)
-
-        print("ensemble members time", ensemble_members_time)
-        print("current year", year)
-        
         # Select the ensemble members for the current year
         current_year_indices = np.where(ensemble_members_time == year)[0]
         current_year_ensemble_members = ensemble_members_array[:, current_year_indices]
-
-        print("current year indices", current_year_indices)
-        print("current year ens members shape", np.shape(current_year_ensemble_members))
 
         # Select N members of the array with the smallest absolute differences and compute their mean
         selected_members, mean_of_selected_members = select_nao_matching_members(year, current_year_ensemble_members, signal_adjusted_nao_index, n_members_to_select)
@@ -463,26 +437,7 @@ def nao_matching(years, ensemble_members_array, ensemble_members_time, obs_nao_i
     return results_array, results_members
 
 
-
-# Example usage:
-# Define the range of years for which you want to perform NAO matching
-# years = range(1970, 1981)  # example range
-# n_members_to_select = 5  # example number of members to select
-
-# Call the nao_matching function
-# results = nao_matching(years, ensemble_members_array, ensemble_members_time, obs_nao_index, obs_time, n_members_to_select)
-
-# The 'results' array will contain the year and the mean of selected members for each year in the range
-# print(results)
-
 # Now write a function to plot the results
-# takes models
-# model times by model
-# model NAO anoms by model
-# obs NAO anoms
-# obs times
-# as input
-# and plots the results
 def plot_NAO_matched(models, model_times_by_model, model_nao_anoms_by_model, obs_nao_anom, obs_time, years, n_members_to_select):
     """
     Plot the results of NAO matching methodology.
