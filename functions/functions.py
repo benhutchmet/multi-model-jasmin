@@ -14,6 +14,7 @@ from scipy.stats import pearsonr, mstats, ttest_rel, ttest_ind, ttest_1samp
 from sklearn.utils import resample
 # import the datetime library
 from datetime import datetime
+from numba import jit
 
 # Also load the dictionaries from dictionaries.py
 sys.path.append("/home/users/benhutch/multi-model/multi-model-jasmin/dictionaries")
@@ -183,9 +184,9 @@ def pearsonr_score(obs, model, model_times, obs_times, start_date, end_date):
     obs_times = np.vectorize(pd.Timestamp)(obs_times)
 
     # debugging for NAO matching
-    print("model times", model_times)
-    print("model times shape", np.shape(model_times))
-    print("model times type", type(model_times))
+    # print("model times", model_times)
+    # print("model times shape", np.shape(model_times))
+    # print("model times type", type(model_times))
 
     # Analyze dimensions of model_times and obs_times
     model_start_index = np.where(model_times == start_date)[0][0]
@@ -636,6 +637,8 @@ def compute_rmse_confidence_intervals(obs_nao_anoms, adjusted_lagged_model_nao_a
     return conf_interval_lower, conf_interval_upper
 
 # optimize function
+# run with machine code to try to speed up
+@jit(nopython=True)
 def optimize_ensemble_members(all_ensemble_members_array, no_ensemble_members, obs_nao_anom, obs_time, model_times):
     """
     Greedily select no_ensemble_members ensemble members that maximizes the ACC scores.
@@ -648,8 +651,8 @@ def optimize_ensemble_members(all_ensemble_members_array, no_ensemble_members, o
                 continue
             ensemble = ensemble_members + [member.tolist()]
             grand_ensemble_mean = np.mean(ensemble, axis=0)
-            acc_score_short, _ = pearsonr_score(obs_nao_anom, grand_ensemble_mean, model_times, obs_time, "1966-01-01","2010-12-31")
-            acc_score_long, _ = pearsonr_score(obs_nao_anom, grand_ensemble_mean, model_times, obs_time, "1966-01-01","2019-12-31")
+            acc_score_short, _ = pearsonr_score(obs_nao_anom, grand_ensemble_mean, model_times, obs_time, "1969-01-01","2010-12-31")
+            acc_score_long, _ = pearsonr_score(obs_nao_anom, grand_ensemble_mean, model_times, obs_time, "1969-01-01","2019-12-31")
             if acc_score_short > max_acc_score_short and acc_score_long > max_acc_score_long:
                 max_acc_score_short, max_acc_score_long, best_member = acc_score_short, acc_score_long, member.tolist()
         if best_member is not None:
@@ -971,35 +974,35 @@ def plot_random_ensemble_members_and_stats_optimize(models, model_times_by_model
 
     # plot each of the members
     for member in optimal_ensemble_members:
-        ax.plot(model_time, member, color="grey", alpha=0.1, linewidth=0.5)
+        ax.plot(lagged_ensemble_members_time, member, color="grey", alpha=0.1, linewidth=0.5)
 
     # Calculate and plot the grand ensemble mean, ACC score, RPC score, and confidence intervals based on the random ensemble members
     grand_ensemble_mean = np.mean(optimal_ensemble_members, axis=0)
 
     # calculate ACC score and p-value for short period
-    acc_score_short, p_value_short = pearsonr_score(obs_nao_anom, grand_ensemble_mean, list(model_times_by_model.values())[0], obs_time, "1969-01-01","2010-12-31")
+    acc_score_short, p_value_short = pearsonr_score(obs_nao_anom, grand_ensemble_mean, lagged_ensemble_members_time, obs_time, "1969-01-01","2010-12-31")
 
     # calculate ACC score and p-value for long period
-    acc_score_long, p_value_long = pearsonr_score(obs_nao_anom, grand_ensemble_mean, list(model_times_by_model.values())[0], obs_time, "1969-01-01","2019-12-31")
+    acc_score_long, p_value_long = pearsonr_score(obs_nao_anom, grand_ensemble_mean, lagged_ensemble_members_time, obs_time, "1969-01-01","2019-12-31")
 
     # calculate RPC score for short period
-    rpc_short = calculate_rpc_time(acc_score_short, optimal_ensemble_members, list(model_times_by_model.values())[0], "1969-01-01","2010-12-31")
+    rpc_short = calculate_rpc_time(acc_score_short, optimal_ensemble_members, lagged_ensemble_members_time, "1969-01-01","2010-12-31")
 
     # calculate RPC score for long period
-    rpc_long = calculate_rpc_time(acc_score_long, optimal_ensemble_members, list(model_times_by_model.values())[0], "1969-01-01","2019-12-31")
+    rpc_long = calculate_rpc_time(acc_score_long, optimal_ensemble_members, lagged_ensemble_members_time, "1969-01-01","2019-12-31")
 
     # Calculate the 5-95% confidence intervals using the two functions options
     conf_interval_lower, conf_interval_upper = calculate_confidence_intervals(optimal_ensemble_members)
 
     # Plot the grand ensemble mean
-    ax.plot(list(model_times_by_model.values())[0], grand_ensemble_mean, color="red", label=f"DCPP-A")
+    ax.plot(lagged_ensemble_members_time, grand_ensemble_mean, color="red", label=f"DCPP-A")
 
     # Plot the 5-95% confidence intervals
     # different shading for the two different time periods
     # short period 1966 - 2010
-    ax.fill_between(list(model_times_by_model.values())[0][:-9], conf_interval_lower[:-9], conf_interval_upper[:-9], color="red", alpha=0.3)
+    ax.fill_between(lagged_ensemble_members_time[:-9], conf_interval_lower[:-9], conf_interval_upper[:-9], color="red", alpha=0.3)
     # for period 2010 - 2019
-    ax.fill_between(list(model_times_by_model.values())[0][-10:], conf_interval_lower[-10:], conf_interval_upper[-10:], color="red", alpha=0.2)
+    ax.fill_between(lagged_ensemble_members_time[-10:], conf_interval_lower[-10:], conf_interval_upper[-10:], color="red", alpha=0.2)
 
     # Plot the observations
     ax.plot(obs_time[2:], obs_nao_anom[2:], color="black", label="ERA5")

@@ -83,11 +83,23 @@ def lag_ensemble(ensemble_members_array, ensemble_members_time, lag=4):
         A 1D array of length n_years - lag + 1 containing the time values for each year in the lagged ensemble.
     """
 
-    # check that the ensemble members array and ensemble members time are the same length
-    # if not, raise an error and exit the function
+    # Convert ensemble_members_time to a numpy array
+    ensemble_members_time = np.array(ensemble_members_time)
+
+    # Convert ensemble_members_array to a numpy array
+    ensemble_members_array = np.array(ensemble_members_array)
+    
+    # print the shape and types of all of the input data
+    # Print the shape and types of the input data
+    print("ensemble_members_array shape:", np.shape(ensemble_members_array))
+    print("ensemble_members_array type:", type(ensemble_members_array))
+    print("ensemble_members_time shape:", np.shape(ensemble_members_time))
+    print("ensemble_members_time type:", type(ensemble_members_time))
+
+    # Check that the ensemble members array and ensemble members time are the same length
     if ensemble_members_array.shape[1] != ensemble_members_time.shape[0]:
         raise ValueError('ensemble_members_array and ensemble_members_time must be the same length')
-    
+
     # make sure that ensemble_members_array is a numpy array
     # if not, convert it to a numpy array
     if type(ensemble_members_array) != np.ndarray:
