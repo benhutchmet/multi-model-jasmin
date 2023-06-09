@@ -8,20 +8,50 @@ import matplotlib.dates as mdates
 import datetime as dt
 import scipy.stats as stats
 import xarray as xr
+from scipy.stats import t
 
 # import dictionaries
 from dictionaries import *
 from functions import *
 
-# create a function for step 1
-# for each start date, i
-# compute the signal-adjusted NAO index of the ensemble mean
-# as inputs, the function takes the ensemble members array, an associated //
-#  model time array, the year of interest, the observed NAO index //
-#  and the observed time array
-# the function returns the signal-adjusted NAO index of the ensemble mean //
-#  and the associated time array
-import datetime as dt
+# Define a function to calculate the confidence intervals
+def calculate_confidence_intervals(ensemble, alpha=0.05):
+    """
+    Calculate the confidence intervals for a given ensemble.
+    
+    Parameters
+    ----------
+    ensemble : numpy.ndarray
+        The ensemble array (members x time).
+    alpha : float
+        The significance level (default is 0.05 for 95% confidence).
+    
+    Returns
+    -------
+    ci_lower : numpy.ndarray
+        The lower bound of the confidence interval.
+    ci_upper : numpy.ndarray
+        The upper bound of the confidence interval.
+    """
+    
+    # Calculate the ensemble mean and standard deviation
+    ensemble_mean = np.mean(ensemble, axis=1)
+    ensemble_std = np.std(ensemble, axis=1, ddof=1)
+
+    # Calculate the degrees of freedom
+    n = ensemble.shape[1]
+    dof = n - 1
+    
+    # Calculate the t-scores for lower and upper confidence levels
+    t_score_lower = t.ppf(alpha / 2, dof)
+    t_score_upper = t.ppf(1 - alpha / 2, dof)
+
+    # Calculate the confidence intervals
+    ci_lower = ensemble_mean + t_score_lower * (ensemble_std / np.sqrt(n))
+    ci_upper = ensemble_mean + t_score_upper * (ensemble_std / np.sqrt(n))
+
+    return ci_lower, ci_upper
+
 
 # Define a new function to lag the ensemble
 def lag_ensemble(ensemble_members_array, ensemble_members_time, lag=4):
@@ -348,7 +378,7 @@ def select_nao_matching_members(year, ensemble_members_array, signal_adjusted_na
     mean_of_selected_members = np.mean(selected_members)
 
     # Return the mean of the selected members
-    return mean_of_selected_members
+    return selected_members, mean_of_selected_members
 
 
 # Example usage:
@@ -383,6 +413,8 @@ def nao_matching(years, ensemble_members_array, ensemble_members_time, obs_nao_i
     -------
     results : numpy.ndarray
         Array containing the year and the mean of selected members for each year
+    results_members : numpy.ndarray
+        Array containing the year and the selected members for each year
     """
 
     # Convert ensemble_members_array and ensemble_members_time to NumPy arrays if they are not already
@@ -391,6 +423,7 @@ def nao_matching(years, ensemble_members_array, ensemble_members_time, obs_nao_i
 
     # Create an empty list to store results
     results = []
+    results_members = []
 
     # Loop through each year
     for year in years:
@@ -415,16 +448,19 @@ def nao_matching(years, ensemble_members_array, ensemble_members_time, obs_nao_i
         print("current year ens members shape", np.shape(current_year_ensemble_members))
 
         # Select N members of the array with the smallest absolute differences and compute their mean
-        mean_of_selected_members = select_nao_matching_members(year, current_year_ensemble_members, signal_adjusted_nao_index, n_members_to_select)
+        selected_members, mean_of_selected_members = select_nao_matching_members(year, current_year_ensemble_members, signal_adjusted_nao_index, n_members_to_select)
         
-        # Append the result to the list
+        # Append the year and the mean of selected members to the results list
         results.append([year, mean_of_selected_members])
+
+        # Also append the selected members to the results members list
+        results_members.append([year, selected_members])
     
     # Convert the results list to a numpy array
     results_array = np.array(results)
     
     # Return the results array
-    return results_array
+    return results_array, results_members
 
 
 
@@ -488,11 +524,16 @@ def plot_NAO_matched(models, model_times_by_model, model_nao_anoms_by_model, obs
             all_ensemble_members.append(member)
 
     # Call the NAO matching function
-    results = nao_matching(years, all_ensemble_members, list(model_times_by_model.values())[0], obs_nao_anom, obs_time, n_members_to_select)
+    results, _ = nao_matching(years, all_ensemble_members, list(model_times_by_model.values())[0], obs_nao_anom, obs_time, n_members_to_select)
 
     # Extract the years and the mean of selected members from the results array
     years = results[:, 0]
     nao_matched_nao_anom = results[:, 1]
+
+    # # Calculate the ACC for the short and long periods
+    # # Using the function pearsonr_score
+    # acc_score_short, p_value_short = pearsonr_score(obs_nao_anom,nao_matched_nao_anom, years, obs_time, "1969-01-01", "2010-12-31")
+    # acc_score_long, p_value_long = pearsonr_score(obs_nao_anom,nao_matched_nao_anom, years, obs_time, "1969-01-01", "2019-12-31")
 
     # Plot the NAO index of the selected members
     ax.plot(years, nao_matched_nao_anom, color='red', label='NAO-matched DCPP-A')
@@ -551,14 +592,48 @@ def plot_NAO_matched_lagged(models, model_times_by_model, model_nao_anoms_by_mod
     # Call the lag ensemble function
     lagged_ensemble_members_array, lagged_ensemble_members_time = lag_ensemble(all_ensemble_members, list(model_times_by_model.values())[0], lag=lag)
 
+    # Calculate the NAO index for the lagged ensemble
+    lagged_ensemble_mean = np.mean(lagged_ensemble_members_array, axis=0)
+
+    # Extract the number of members
+    # From the lagged ensemble
+    n_members = lagged_ensemble_members_array.shape[0]
+
+    # Calculate the ACC for the short and long periods
+    # For the lagged ensemble
+    acc_score_short_lagged, p_value_short_lagged = pearsonr_score(obs_nao_anom, lagged_ensemble_mean, years, obs_time, "1969-01-01", "2010-12-31")
+    acc_score_long_lagged, p_value_long_lagged = pearsonr_score(obs_nao_anom, lagged_ensemble_mean, years, obs_time, "1969-01-01", "2019-12-31")
+
+    # Now use these ACC scores to calculate the RPC score
+    # For the lagged ensemble
+    # Using the function calculate_rpc_time
+    rpc_short_lagged = calculate_rpc_time(acc_score_short_lagged, lagged_ensemble_members_array, lagged_ensemble_members_time, "1969-01-01", "2010-12-31")
+    rpc_long_lagged = calculate_rpc_time(acc_score_long_lagged, lagged_ensemble_members_array, lagged_ensemble_members_time, "1969-01-01", "2019-12-31")
+
     # Call the NAO matching function
-    results = nao_matching(years, lagged_ensemble_members_array, lagged_ensemble_members_time, obs_nao_anom, obs_time, n_members_to_select)
+    results, results_members = nao_matching(years, lagged_ensemble_members_array, lagged_ensemble_members_time, obs_nao_anom, obs_time, n_members_to_select)
+
+    # Look at the dimensions of the results members
+    print("The dimensions of the results members are: ", results_members.shape)
+    print("Results members are: ", results_members)
 
     # Extract the years and the mean of selected members from the results array
     years, nao_matched_nao_anom_lagged = results[:, 0], results[:, 1]
 
+    # Calculate the ACC for the short and long periods
+    # Using the function pearsonr_score
+    acc_score_short, p_value_short = pearsonr_score(obs_nao_anom,nao_matched_nao_anom_lagged, years, obs_time, "1969-01-01", "2010-12-31")
+    acc_score_long, p_value_long = pearsonr_score(obs_nao_anom,nao_matched_nao_anom_lagged, years, obs_time, "1969-01-01", "2019-12-31")
+
     # Plot the NAO index of the selected members
     ax.plot(years, nao_matched_nao_anom_lagged, color='red', label='NAO-matched DCPP-A lagged')
+
+    # Call the function to calculate the confidence intervals
+    ci_5, ci_95 = calculate_confidence_intervals(results_members, alpha=0.05)
+
+    # Add the confidence intervals to the plot
+    ax.fill_between(years, ci_5[:-9], ci_95[:-9], color='red', alpha=0.3)
+    ax.fill_between(years, ci_5[-10:], ci_95[-10:], color='red', alpha=0.2)
 
     # Plot the observed NAO index 
     ax.plot(obs_time, obs_nao_anom, color='black', label='Observations')
@@ -568,6 +643,23 @@ def plot_NAO_matched_lagged(models, model_times_by_model, model_nao_anoms_by_mod
     ax.set_ylim([-10, 10])
     ax.set_xlabel("Year")
     ax.set_ylabel("NAO anomalies (hPa)")
+
+    # Check if the p_values are less than 0.01 and set the text accordingly
+    if p_value_short < 0.01 and p_value_long < 0.01:
+        p_value_text_short = '< 0.01'
+        p_value_text_long = '< 0.01'
+    elif p_value_short < 0.01:
+        p_value_text_short = '< 0.01'
+        p_value_text_long = f'= {p_value_long:.2f}'
+    elif p_value_long < 0.01:
+        p_value_text_short = f'= {p_value_short:.2f}'
+        p_value_text_long = '< 0.01'
+    else:
+        p_value_text_short = f'= {p_value_short:.2f}'
+        p_value_text_long = f'= {p_value_long:.2f}'
+    
+    # Set the title with the ACC and RPC scores
+    ax.set_title(f"ACC = +{acc_score_short:.2f} (+{acc_score_long:.2f}), P {p_value_text_short} ({p_value_text_long}), RPC = +{rpc_short_lagged:.2f} (+{rpc_long_lagged:.2f}), N = {n_members}")
 
     ax.legend(loc="lower right")
     plt.show()
