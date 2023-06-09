@@ -1191,7 +1191,7 @@ def plot_ensemble_members_and_lagged_adjusted_mean(models, model_times_by_model,
 
         # Plot ensemble members
         for member in model_nao_anom:
-            #ax.plot(model_time, member, color="grey", alpha=0.1, linewidth=0.5)
+            ax.plot(model_time, member, color="grey", alpha=0.1, linewidth=0.5)
 
             # Add each member to the list of all ensemble members
             all_ensemble_members.append(member)
