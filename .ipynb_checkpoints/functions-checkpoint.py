@@ -631,8 +631,16 @@ def compute_rmse_confidence_intervals(obs_nao_anoms, adjusted_lagged_model_nao_a
     z_score_upper = np.percentile(rmse, upper_bound)
     
     # Calculate the 5% and 95% confidence intervals using the RMSE
-    conf_interval_lower = adjusted_lagged_model_nao_anoms_matched - (z_score_upper * rmse)
-    conf_interval_upper = adjusted_lagged_model_nao_anoms_matched + (z_score_upper * rmse)
+    #conf_interval_lower = adjusted_lagged_model_nao_anoms_matched - (z_score_upper * rmse)
+    # test
+    # spread should be twice the rms error
+    # x rms either side
+    conf_interval_lower = adjusted_lagged_model_nao_anoms_matched - (rmse)
+    # original
+    #conf_interval_upper = adjusted_lagged_model_nao_anoms_matched + (z_score_upper * rmse)
+    # test
+    conf_interval_upper = adjusted_lagged_model_nao_anoms_matched + (rmse)
+    
 
     return conf_interval_lower, conf_interval_upper
 
